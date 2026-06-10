@@ -39,7 +39,8 @@ jobs: # 定义工作流中的作业列表
           FIRST=true
           for f in *.html; do
             [ ! -f "$f" ] && continue
-            TITLE=$(sed -n 's/.*<title>\(.*\)<\/title>.*/\1/p;q' "$f")
+            # 提取 <title> 标签内容（支持跨行）
+            TITLE=$(sed -n '/<title>/,/<\/title>/{s/.*<title>//;s/<\/title>.*//;p}' "$f" | head -1 | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
             [ -z "$TITLE" ] && TITLE="$f"
             # 转义 JSON 中的特殊字符
             TITLE=$(printf '%s' "$TITLE" | sed 's/\\/\\\\/g; s/"/\\"/g')
