@@ -32,15 +32,38 @@ jobs:  # 定义工作流中的作业列表
       - name: Checkout  # 步骤1：检出代码
         uses: actions/checkout@v4  # 使用官方 checkout 动作，将仓库代码拉取到运行环境中
 
-      - name: Setup Pages  # 步骤2：配置 GitHub Pages
+      - name: Generate sitemap.json  # 步骤2：扫描 pages/ 目录自动生成站点地图
+        run: |
+          cd pages
+          echo "[" > sitemap.json
+          FIRST=true
+          for f in *.html; do
+            [ ! -f "$f" ] && continue
+            TITLE=$(sed -n 's/.*<title>\(.*\)<\/title>.*/\1/p;q' "$f")
+            [ -z "$TITLE" ] && TITLE="$f"
+            # 转义 JSON 中的特殊字符
+            TITLE=$(printf '%s' "$TITLE" | sed 's/\\/\\\\/g; s/"/\\"/g')
+            if [ "$FIRST" = true ]; then
+              FIRST=false
+            else
+              echo "," >> sitemap.json
+            fi
+            printf '  {"name":"%s","url":"pages/%s","description":""}' "$TITLE" "$f" >> sitemap.json
+          done
+          echo "" >> sitemap.json
+          echo "]" >> sitemap.json
+          echo "Generated sitemap.json:"
+          cat sitemap.json
+
+      - name: Setup Pages  # 步骤3：配置 GitHub Pages
         uses: actions/configure-pages@v5  # 自动检测和配置 Pages 的构建方式
 
-      - name: Upload artifact  # 步骤3：上传静态站点文件作为构建产物
+      - name: Upload artifact  # 步骤4：上传静态站点文件作为构建产物
         uses: actions/upload-pages-artifact@v3  # 将网站文件打包上传
         with:  # 传递参数给此动作
           # 上传整个仓库目录作为网站根目录
           path: '.'  # 指定当前目录（项目根目录）下的所有文件
 
-      - name: Deploy to GitHub Pages  # 步骤4：正式部署到 GitHub Pages
+      - name: Deploy to GitHub Pages  # 步骤5：正式部署到 GitHub Pages
         id: deployment  # 为这一步指定唯一 ID，方便在其他地方引用（如上面获取 page_url）
         uses: actions/deploy-pages@v5  # 使用官方的 GitHub Pages 部署动作，将产物发布上线
