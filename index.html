@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,16 +15,12 @@
             --accent: #4f46e5;
             --accent-hover: #4338ca;
             --accent-light: #eef2ff;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-            --shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
-            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-hover: 0 10px 25px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+            --radius: 10px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -37,7 +32,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 960px;
             margin: 0 auto;
             padding: 40px 24px 60px;
             width: 100%;
@@ -48,7 +43,6 @@
             text-align: center;
             padding: 48px 0 40px;
         }
-
         .header .logo {
             font-size: 36px;
             font-weight: 800;
@@ -56,13 +50,11 @@
             letter-spacing: -0.5px;
             margin-bottom: 8px;
         }
-
         .header .subtitle {
             font-size: 15px;
             color: var(--text-muted);
             font-weight: 400;
         }
-
         .header .divider {
             width: 48px;
             height: 3px;
@@ -81,7 +73,6 @@
             font-size: 13px;
             color: var(--text-muted);
         }
-
         .stats-bar span strong {
             color: var(--text-secondary);
             font-weight: 600;
@@ -90,59 +81,61 @@
         /* Grid */
         .page-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
         }
 
         /* Card */
         .page-card {
             background: var(--card-bg);
             border-radius: var(--radius);
-            padding: 28px;
+            padding: 24px 28px;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-left: 3px solid transparent;
+            transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 10px;
             text-decoration: none;
             color: inherit;
             cursor: pointer;
+            position: relative;
         }
-
         .page-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
+            border-left-color: var(--accent);
         }
 
-        .page-card .card-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            background: var(--accent-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-        }
-
-        .page-card .card-body {
-            flex: 1;
-        }
-
-        .page-card .card-title {
-            font-size: 17px;
+        .page-card .card-name {
+            font-size: 18px;
             font-weight: 600;
             color: var(--text);
-            margin-bottom: 6px;
             line-height: 1.3;
+        }
+        .page-card:hover .card-name {
+            color: var(--accent);
         }
 
         .page-card .card-desc {
             font-size: 13px;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .page-card .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 2px;
+        }
+
+        .page-card .card-url {
+            font-size: 11px;
+            color: #c0c4cc;
+            font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
         }
 
         .page-card .card-action {
@@ -156,17 +149,14 @@
             transform: translateX(-4px);
             transition: opacity 0.2s ease, transform 0.2s ease;
         }
-
         .page-card:hover .card-action {
             opacity: 1;
             transform: translateX(0);
         }
-
         .page-card .card-action .arrow {
             display: inline-block;
             transition: transform 0.2s ease;
         }
-
         .page-card:hover .card-action .arrow {
             transform: translateX(3px);
         }
@@ -175,24 +165,40 @@
         .empty-state {
             grid-column: 1 / -1;
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: var(--text-muted);
         }
-
         .empty-state .empty-icon {
             font-size: 48px;
             margin-bottom: 12px;
-            opacity: 0.4;
+            opacity: 0.3;
         }
-
         .empty-state p {
             font-size: 14px;
             margin-bottom: 4px;
         }
-
         .empty-state .hint {
             font-size: 12px;
-            opacity: 0.6;
+            opacity: 0.5;
+        }
+
+        /* Loading */
+        .loading {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: center;
+            padding: 80px 20px;
+        }
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Footer */
@@ -202,128 +208,101 @@
             padding: 24px;
             font-size: 12px;
             color: var(--text-muted);
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         /* Responsive */
         @media (max-width: 640px) {
-            .container {
-                padding: 24px 16px 40px;
-            }
-
-            .header {
-                padding: 32px 0 28px;
-            }
-
-            .header .logo {
-                font-size: 28px;
-            }
-
-            .page-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .page-card .card-action {
-                opacity: 1;
-                transform: none;
-            }
+            .container { padding: 24px 16px 40px; }
+            .header { padding: 32px 0 28px; }
+            .header .logo { font-size: 28px; }
+            .page-grid { grid-template-columns: 1fr; }
+            .page-card .card-action { opacity: 1; transform: none; }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
             <div class="logo">LBN Tools</div>
             <p class="subtitle">实用在线工具集</p>
             <div class="divider"></div>
-            <div class="stats-bar" id="stats" style="margin-top: 20px;">
-                <span>共 <strong id="pageCount">0</strong> 个工具</span>
+            <div class="stats-bar" style="margin-top: 20px;">
+                <span>共 <strong id="pageCount">-</strong> 个工具</span>
             </div>
         </header>
 
-        <!-- Page Grid -->
-        <div class="page-grid" id="pageGrid"></div>
+        <div class="page-grid" id="pageGrid">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
-        &copy; 2026 LBN Tools · 自动发现 <span id="footerCount">0</span> 个页面
+        &copy; 2026 LBN Tools
     </footer>
 
-    <!-- PAGE_LIST_START -->
     <script>
-        var PAGE_LIST = [
-            {
-                "name": "json.html",
-                "title": "JSON 工具",
-                "description": "格式化、压缩、转义/去转义 JSON 数据",
-                "icon": "bracket"
-            }
-        ];
-    </script>
-    <!-- PAGE_LIST_END -->
+    (function() {
+        var grid = document.getElementById('pageGrid');
+        var pageCountEl = document.getElementById('pageCount');
 
-    <script>
-        (function () {
-            var grid = document.getElementById('pageGrid');
-            var pageCountEl = document.getElementById('pageCount');
-            var footerCountEl = document.getElementById('footerCount');
+        function renderCards(pages) {
+            grid.innerHTML = '';
 
-            var iconMap = {
-                'bracket': '\u2774\u2775',
-                'code': '\u2039/\u203A',
-                'edit': '\u270E',
-                'image': '\u25A3',
-                'calc': '\u002B\u2212',
-                'text': '\u00B6',
-                'tool': '\u2699',
-                'data': '\u2261',
-                'default': '\u25C9'
-            };
-
-            function getIcon(iconKey) {
-                return iconMap[iconKey] || iconMap['default'];
+            if (!pages || pages.length === 0) {
+                grid.innerHTML =
+                    '<div class="empty-state">' +
+                    '<div class="empty-icon">&#128450;</div>' +
+                    '<p>暂无工具页面</p>' +
+                    '<p class="hint">在 pages/sitemap.json 中添加页面即可在此显示</p>' +
+                    '</div>';
+                pageCountEl.textContent = '0';
+                return;
             }
 
-            function renderCards(pages) {
-                grid.innerHTML = '';
+            pageCountEl.textContent = pages.length;
 
-                if (!pages || pages.length === 0) {
-                    grid.innerHTML =
-                        '<div class="empty-state">' +
-                        '<div class="empty-icon">&#128194;</div>' +
-                        '<p>暂无工具页面</p>' +
-                        '<p class="hint">将 HTML 文件放入 pages 目录，页面将自动出现在这里</p>' +
-                        '</div>';
-                    pageCountEl.textContent = '0';
-                    footerCountEl.textContent = '0';
-                    return;
-                }
+            var html = '';
+            pages.forEach(function(page) {
+                html +=
+                    '<a class="page-card" href="' + page.url + '">' +
+                    '<div class="card-name">' + (page.name || '') + '</div>' +
+                    '<div class="card-desc">' + (page.description || '') + '</div>' +
+                    '<div class="card-meta">' +
+                    '<span class="card-url">' + (page.url || '') + '</span>' +
+                    '<span class="card-action">打开 <span class="arrow">&rarr;</span></span>' +
+                    '</div>' +
+                    '</a>';
+            });
+            grid.innerHTML = html;
+        }
 
-                pageCountEl.textContent = pages.length;
-                footerCountEl.textContent = pages.length;
+        function renderError(msg) {
+            grid.innerHTML =
+                '<div class="empty-state">' +
+                '<div class="empty-icon">&#9888;</div>' +
+                '<p>加载页面清单失败</p>' +
+                '<p class="hint">' + msg + '</p>' +
+                '<p class="hint" style="margin-top:8px;">请检查 pages/sitemap.json 是否存在且格式正确</p>' +
+                '</div>';
+            pageCountEl.textContent = '-';
+        }
 
-                var html = '';
-                pages.forEach(function (page) {
-                    var icon = getIcon(page.icon);
-                    html +=
-                        '<a class="page-card" href="pages/' + page.name + '">' +
-                        '<div class="card-icon">' + icon + '</div>' +
-                        '<div class="card-body">' +
-                        '<div class="card-title">' + (page.title || page.name) + '</div>' +
-                        '<div class="card-desc">' + (page.description || '') + '</div>' +
-                        '</div>' +
-                        '<span class="card-action">打开 <span class="arrow">&rarr;</span></span>' +
-                        '</a>';
-                });
-                grid.innerHTML = html;
-            }
-
-            renderCards(PAGE_LIST);
-        })();
+        fetch('pages/sitemap.json', { cache: 'no-cache' })
+            .then(function(res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function(data) {
+                if (!Array.isArray(data)) throw new Error('sitemap.json 应为数组格式');
+                renderCards(data);
+            })
+            .catch(function(err) {
+                renderError(err.message);
+            });
+    })();
     </script>
 </body>
-
 </html>

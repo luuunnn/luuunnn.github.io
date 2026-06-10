@@ -1,0 +1,7 @@
+[
+  {
+    "name": "JSON 工具",
+    "url": "pages/json.html",
+    "description": "格式化、压缩、转义/去转义 JSON 数据"
+  }
+]
