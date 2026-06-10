@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -190,6 +191,7 @@
         }
     </style>
 </head>
+
 <body>
     <div id="app">
         <div class="json-tool">
@@ -199,14 +201,20 @@
             </div>
 
             <div class="json-toolbar">
-                <el-button type="primary" @click="formatJson"><el-icon><edit-icon></edit-icon></el-icon>&nbsp;格式化</el-button>
-                <el-button type="success" @click="compressJson"><el-icon><switch-icon></switch-icon></el-icon>&nbsp;压缩</el-button>
+                <el-button type="primary"
+                    @click="formatJson"><el-icon><edit-icon></edit-icon></el-icon>&nbsp;格式化</el-button>
+                <el-button type="success"
+                    @click="compressJson"><el-icon><switch-icon></switch-icon></el-icon>&nbsp;压缩</el-button>
                 <el-divider direction="vertical"></el-divider>
-                <el-button @click="escapeJson"><el-icon><d-arrow-right-icon></d-arrow-right-icon></el-icon>&nbsp;转义</el-button>
-                <el-button @click="unescapeJson"><el-icon><d-arrow-left-icon></d-arrow-left-icon></el-icon>&nbsp;去转义</el-button>
+                <el-button
+                    @click="escapeJson"><el-icon><d-arrow-right-icon></d-arrow-right-icon></el-icon>&nbsp;转义</el-button>
+                <el-button
+                    @click="unescapeJson"><el-icon><d-arrow-left-icon></d-arrow-left-icon></el-icon>&nbsp;去转义</el-button>
                 <el-divider direction="vertical"></el-divider>
-                <el-button @click="copyResult" :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
-                <el-button @click="clearAll" :disabled="!jsonText && !resultText" type="info" plain><el-icon><delete-icon></delete-icon></el-icon>&nbsp;清空</el-button>
+                <el-button @click="copyResult"
+                    :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
+                <el-button @click="clearAll" :disabled="!jsonText && !resultText" type="info"
+                    plain><el-icon><delete-icon></delete-icon></el-icon>&nbsp;清空</el-button>
                 <span style="flex:1"></span>
                 <el-switch v-model="autoFormat" size="small" active-text="处理后自动格式化"></el-switch>
             </div>
@@ -217,11 +225,8 @@
                     <div class="json-panel-body">
                         <div class="code-viewer">
                             <pre class="code-lines">{{ inputLineNumbers }}</pre>
-                            <textarea v-model="jsonText"
-                                      class="code-textarea"
-                                      placeholder="在此粘贴或输入 JSON 字符串..."
-                                      @keydown="onKeydown"
-                                      spellcheck="false"></textarea>
+                            <textarea v-model="jsonText" class="code-textarea" placeholder="在此粘贴或输入 JSON 字符串..."
+                                @keydown="onKeydown" spellcheck="false"></textarea>
                         </div>
                     </div>
                 </div>
@@ -248,8 +253,10 @@
 
             <div class="json-footer">
                 <div class="stats">
-                    <span><span class="label">输入</span> 字符: <strong>{{ inputCharCount.toLocaleString() }}</strong> | 行: <strong>{{ inputLineCount }}</strong> | <strong>{{ inputSizeText }}</strong></span>
-                    <span><span class="label">结果</span> 字符: <strong>{{ resultCharCount.toLocaleString() }}</strong> | 行: <strong>{{ resultLineCount }}</strong> | <strong>{{ resultSizeText }}</strong></span>
+                    <span><span class="label">输入</span> 字符: <strong>{{ inputCharCount.toLocaleString() }}</strong> | 行:
+                        <strong>{{ inputLineCount }}</strong> | <strong>{{ inputSizeText }}</strong></span>
+                    <span><span class="label">结果</span> 字符: <strong>{{ resultCharCount.toLocaleString() }}</strong> | 行:
+                        <strong>{{ resultLineCount }}</strong> | <strong>{{ resultSizeText }}</strong></span>
                 </div>
                 <span>{{ statusText }}</span>
             </div>
@@ -463,4 +470,5 @@
         app.mount('#app');
     </script>
 </body>
+
 </html>
