@@ -1,43 +1,46 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# 用于将静态内容部署到 GitHub Pages 的简易工作流
+name: Deploy static content to Pages  # 工作流名称，会显示在 GitHub Actions 标签页中
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+on:  # 定义触发此工作流的事件
+  # 当代码推送到默认分支时自动运行
+  push:  # 监听 push 事件
+    branches: ["main"]  # 只监听 main 分支的推送（你的主分支）
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  # 允许从 GitHub Actions 标签页手动触发此工作流
+  workflow_dispatch:  # 手动触发事件，无需代码推送
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# 设置 GITHUB_TOKEN 的权限，以允许部署到 GitHub Pages
+permissions:  # 定义工作流运行时的权限范围
+  contents: read  # 允许读取仓库内容（拉取代码）
+  pages: write    # 允许写入 GitHub Pages 配置
+  id-token: write # 允许获取 OIDC 令牌，用于身份验证（GitHub Pages 部署需要）
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+# 并发控制：同一时间只允许一个部署任务运行，跳过排队中的冗余任务。
+# 但不会取消正在运行的任务，因为我们希望已开始的生产部署能够顺利完成。
+concurrency:  # 并发策略设置
+  group: "pages"  # 并发组名称，同组的任务会互相排队/取消
+  cancel-in-progress: false  # 不取消正在运行中的部署（确保安全）
 
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+jobs:  # 定义工作流中的作业列表
+  # 只有一个部署作业，因为本项目只需要部署静态文件
+  deploy:  # 作业名称，可自定义
+    environment:  # 指定部署的目标环境
+      name: github-pages  # 环境名称为 GitHub Pages
+      url: ${{ steps.deployment.outputs.page_url }}  # 部署完成后，动态获取网站的实际 URL
+    runs-on: ubuntu-latest  # 指定运行作业的虚拟环境为最新版 Ubuntu
+    steps:  # 作业中的执行步骤列表，按顺序执行
+      - name: Checkout  # 步骤1：检出代码
+        uses: actions/checkout@v4  # 使用官方 checkout 动作，将仓库代码拉取到运行环境中
+
+      - name: Setup Pages  # 步骤2：配置 GitHub Pages
+        uses: actions/configure-pages@v5  # 自动检测和配置 Pages 的构建方式
+
+      - name: Upload artifact  # 步骤3：上传静态站点文件作为构建产物
+        uses: actions/upload-pages-artifact@v3  # 将网站文件打包上传
+        with:  # 传递参数给此动作
+          # 上传整个仓库目录作为网站根目录
+          path: '.'  # 指定当前目录（项目根目录）下的所有文件
+
+      - name: Deploy to GitHub Pages  # 步骤4：正式部署到 GitHub Pages
+        id: deployment  # 为这一步指定唯一 ID，方便在其他地方引用（如上面获取 page_url）
+        uses: actions/deploy-pages@v5  # 使用官方的 GitHub Pages 部署动作，将产物发布上线
