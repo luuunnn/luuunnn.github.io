@@ -2,5 +2,9 @@
     {
         "name": "JSON 工具",
         "url": "pages/json.html"
+    },
+    {
+        "name": "JS 工具",
+        "url": "pages/js.html"
     }
 ]

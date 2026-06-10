@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LBN JSON</title>
+    <title>LBN JS</title>
     <link rel="stylesheet" href="/assets/libs/element-plus/element-plus.index.css">
     <style>
         body {
@@ -13,7 +13,7 @@
             min-height: 100vh;
         }
 
-        .json-tool {
+        .js-tool {
             max-width: 1600px;
             margin: 0 auto;
             padding: 16px;
@@ -23,23 +23,23 @@
             box-sizing: border-box;
         }
 
-        .json-header {
+        .js-header {
             margin-bottom: 12px;
         }
 
-        .json-header h3 {
+        .js-header h3 {
             margin: 0 0 4px 0;
             font-size: 20px;
             color: #303133;
         }
 
-        .json-header p {
+        .js-header p {
             margin: 0;
             color: #909399;
             font-size: 13px;
         }
 
-        .json-toolbar {
+        .js-toolbar {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -47,26 +47,26 @@
             align-items: center;
         }
 
-        .json-toolbar .el-divider--vertical {
+        .js-toolbar .el-divider--vertical {
             height: 24px;
             margin: 0 4px;
         }
 
-        .json-panels {
+        .js-panels {
             flex: 1;
             min-height: 0;
             display: flex;
             gap: 12px;
         }
 
-        .json-panel {
+        .js-panel {
             flex: 1;
             display: flex;
             flex-direction: column;
             min-width: 0;
         }
 
-        .json-panel-header {
+        .js-panel-header {
             font-size: 13px;
             color: #606266;
             font-weight: 500;
@@ -76,16 +76,16 @@
             gap: 8px;
         }
 
-        .json-panel-body {
+        .js-panel-body {
             flex: 1;
             min-height: 0;
         }
 
-        .json-panel-body .el-textarea {
+        .js-panel-body .el-textarea {
             height: 100%;
         }
 
-        .json-panel-body .el-textarea__inner {
+        .js-panel-body .el-textarea__inner {
             height: 100% !important;
             font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
             font-size: 13px;
@@ -163,11 +163,11 @@
             white-space: pre;
         }
 
-        .json-error {
+        .js-error {
             margin-top: 6px;
         }
 
-        .json-footer {
+        .js-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -176,16 +176,16 @@
             color: #909399;
         }
 
-        .json-footer .stats {
+        .js-footer .stats {
             display: flex;
             gap: 20px;
         }
 
-        .json-footer .stats span strong {
+        .js-footer .stats span strong {
             color: #606266;
         }
 
-        .json-footer .stats .label {
+        .js-footer .stats .label {
             color: #c0c4cc;
             margin-right: 2px;
         }
@@ -194,50 +194,50 @@
 
 <body>
     <div id="app">
-        <div class="json-tool">
-            <div class="json-header">
-                <h3>JSON 工具</h3>
-                <p>在左侧输入 JSON，使用下方按钮操作，结果将显示在右侧</p>
+        <div class="js-tool">
+            <div class="js-header">
+                <h3>JS 工具</h3>
+                <p>在左侧输入 JavaScript 代码，使用下方按钮操作，结果将显示在右侧</p>
             </div>
 
-            <div class="json-toolbar">
+            <div class="js-toolbar">
                 <el-button @click="goHome" text><el-icon><home-filled-icon></el-icon></el-icon>&nbsp;返回首页</el-button>
                 <el-divider direction="vertical"></el-divider>
                 <el-button type="primary"
-                    @click="formatJson"><el-icon><edit-icon></edit-icon></el-icon>&nbsp;格式化</el-button>
+                    @click="formatJs"><el-icon><edit-icon></edit-icon></el-icon>&nbsp;格式化</el-button>
                 <el-button type="success"
-                    @click="compressJson"><el-icon><switch-icon></switch-icon></el-icon>&nbsp;压缩</el-button>
-                <el-divider direction="vertical"></el-divider>
-                <el-button
-                    @click="escapeJson"><el-icon><d-arrow-right-icon></d-arrow-right-icon></el-icon>&nbsp;转义</el-button>
-                <el-button
-                    @click="unescapeJson"><el-icon><d-arrow-left-icon></d-arrow-left-icon></el-icon>&nbsp;去转义</el-button>
+                    @click="minifyJs"><el-icon><switch-icon></switch-icon></el-icon>&nbsp;压缩</el-button>
                 <el-divider direction="vertical"></el-divider>
                 <el-button @click="copyResult"
                     :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
-                <el-button @click="clearAll" :disabled="!jsonText && !resultText" type="info"
+                <el-button @click="clearAll" :disabled="!jsText && !resultText" type="info"
                     plain><el-icon><delete-icon></delete-icon></el-icon>&nbsp;清空</el-button>
                 <span style="flex:1"></span>
-                <el-switch v-model="autoFormat" size="small" active-text="处理后自动格式化"></el-switch>
+                <span style="font-size:12px;color:#909399;display:flex;align-items:center;gap:4px;">
+                    缩进
+                    <el-input-number v-model="indentSize" :min="1" :max="8" size="small"
+                        style="width:80px;"></el-input-number>
+                </span>
             </div>
 
-            <div class="json-panels">
-                <div class="json-panel json-panel-input">
-                    <div class="json-panel-header">输入</div>
-                    <div class="json-panel-body">
+            <div class="js-panels">
+                <div class="js-panel js-panel-input">
+                    <div class="js-panel-header">输入</div>
+                    <div class="js-panel-body">
                         <div class="code-viewer">
-                            <pre class="code-lines">{{ inputLineNumbers }}</pre>
-                            <textarea v-model="jsonText" class="code-textarea" placeholder="在此粘贴或输入 JSON 字符串..."
-                                @keydown="onKeydown" spellcheck="false"></textarea>
+                            <pre class="code-lines" ref="inputLines">{{ inputLineNumbers }}</pre>
+                            <textarea ref="inputArea" v-model="jsText" class="code-textarea"
+                                placeholder="在此粘贴或输入 JavaScript 代码..." @keydown="onKeydown"
+                                spellcheck="false"></textarea>
                         </div>
                     </div>
                 </div>
-                <div class="json-panel json-panel-output">
-                    <div class="json-panel-header">
+                <div class="js-panel js-panel-output">
+                    <div class="js-panel-header">
                         结果
                         <span style="font-weight:400;color:#c0c4cc;font-size:12px;">{{ resultStatus }}</span>
                     </div>
-                    <div class="json-panel-body">
+                    <div class="js-panel-body">
                         <div class="code-viewer" v-if="resultText">
                             <pre class="code-lines">{{ resultLineNumbers }}</pre>
                             <pre class="code-content">{{ resultText }}</pre>
@@ -249,11 +249,11 @@
                 </div>
             </div>
 
-            <div class="json-error" v-if="errorMsg">
+            <div class="js-error" v-if="errorMsg">
                 <el-alert :title="errorMsg" type="error" :closable="true" show-icon @close="errorMsg=''"></el-alert>
             </div>
 
-            <div class="json-footer">
+            <div class="js-footer">
                 <div class="stats">
                     <span><span class="label">输入</span> 字符: <strong>{{ inputCharCount.toLocaleString() }}</strong> | 行:
                         <strong>{{ inputLineCount }}</strong> | <strong>{{ inputSizeText }}</strong></span>
@@ -268,31 +268,35 @@
     <script src="/assets/libs/vue/vue.global.prod.js"></script>
     <script src="/assets/libs/element-plus/element-plus.index.full.min.js"></script>
     <script src="/assets/libs/element-plus/element-plus.icons.iife.min.js"></script>
+    <script src="/assets/libs/js-beautify/beautify.js"></script>
+    <script src="/assets/libs/terser/terser.min.js"></script>
 
     <script type="text/javascript">
-        const { createApp, ref, computed } = Vue;
+        const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
 
         const app = createApp({
             setup() {
-                const jsonText = ref('');
+                const jsText = ref('');
                 const resultText = ref('');
                 const errorMsg = ref('');
                 const statusText = ref('');
                 const resultStatus = ref('');
-                const autoFormat = ref(true);
+                const indentSize = ref(2);
+                const inputArea = ref(null);
+                const inputLines = ref(null);
 
-                const inputCharCount = computed(function () { return jsonText.value.length; });
+                const inputCharCount = computed(function () { return jsText.value.length; });
                 const inputLineCount = computed(function () {
-                    if (!jsonText.value) return 0;
-                    return jsonText.value.split(/\r?\n/).length;
+                    if (!jsText.value) return 0;
+                    return jsText.value.split(/\r?\n/).length;
                 });
                 const inputSizeText = computed(function () {
-                    return formatSize(jsonText.value);
+                    return formatSize(jsText.value);
                 });
 
                 const inputLineNumbers = computed(function () {
-                    if (!jsonText.value) return '1';
-                    const lines = jsonText.value.split(/\r?\n/);
+                    if (!jsText.value) return '1';
+                    const lines = jsText.value.split(/\r?\n/);
                     const nums = [];
                     for (let i = 0; i < lines.length; i++) {
                         nums.push(i + 1);
@@ -343,65 +347,46 @@
                     resultStatus.value = '操作失败';
                 }
 
-                function formatJson() {
-                    if (!jsonText.value) return;
+                function formatJs() {
+                    if (!jsText.value) return;
                     try {
-                        const obj = JSON.parse(jsonText.value);
-                        setResult(JSON.stringify(obj, null, 2), '格式化完成');
+                        const formatted = js_beautify(jsText.value, {
+                            indent_size: indentSize.value,
+                            indent_char: ' ',
+                            max_preserve_newlines: 2,
+                            preserve_newlines: true,
+                            space_in_empty_paren: false,
+                            jslint_happy: false,
+                            space_after_anon_function: false,
+                            brace_style: 'collapse',
+                            keep_array_indentation: false,
+                            keep_function_indentation: false,
+                            space_before_conditional: true,
+                            break_chained_methods: false,
+                            unescape_strings: false,
+                            e4x: false,
+                            comma_first: false,
+                            operator_position: 'before-newline',
+                        });
+                        setResult(formatted, '格式化完成');
                         setStatus('格式化完成');
                     } catch (e) {
-                        showError('JSON 解析失败: ' + e.message);
+                        showError('JS 格式化失败: ' + e.message);
                     }
                 }
 
-                function compressJson() {
-                    if (!jsonText.value) return;
+                function minifyJs() {
+                    if (!jsText.value) return;
                     try {
-                        const obj = JSON.parse(jsonText.value);
-                        setResult(JSON.stringify(obj), '压缩完成');
+                        const result = Terser.minify_sync(jsText.value);
+                        if (result.error) {
+                            showError('JS 压缩失败: ' + result.error.message);
+                            return;
+                        }
+                        setResult(result.code, '压缩完成');
                         setStatus('压缩完成');
                     } catch (e) {
-                        showError('JSON 解析失败: ' + e.message);
-                    }
-                }
-
-                function escapeJson() {
-                    if (!jsonText.value) return;
-                    try {
-                        const obj = JSON.parse(jsonText.value);
-                        let escaped = JSON.stringify(JSON.stringify(obj));
-                        if (autoFormat.value) {
-                            try { escaped = JSON.stringify(JSON.parse(escaped), null, 2); } catch (_) { }
-                        }
-                        setResult(escaped, '转义完成');
-                        setStatus('转义完成');
-                    } catch (e) {
-                        try {
-                            const escaped = JSON.stringify(jsonText.value);
-                            setResult(escaped, '转义完成（文本模式）');
-                            setStatus('转义完成（文本模式）');
-                        } catch (e2) {
-                            showError('转义失败: ' + e2.message);
-                        }
-                    }
-                }
-
-                function unescapeJson() {
-                    if (!jsonText.value) return;
-                    try {
-                        const parsed = JSON.parse(jsonText.value);
-                        if (typeof parsed === 'string') {
-                            let result = parsed;
-                            if (autoFormat.value) {
-                                try { result = JSON.stringify(JSON.parse(parsed), null, 2); } catch (_) { }
-                            }
-                            setResult(result, '去转义完成');
-                        } else {
-                            setResult(JSON.stringify(parsed, null, 2), '去转义完成（已是 JSON 对象）');
-                        }
-                        setStatus('去转义完成');
-                    } catch (e) {
-                        showError('去转义失败: ' + e.message);
+                        showError('JS 压缩失败: ' + e.message);
                     }
                 }
 
@@ -416,35 +401,76 @@
                 }
 
                 function clearAll() {
-                    jsonText.value = '';
+                    jsText.value = '';
                     resultText.value = '';
                     errorMsg.value = '';
                     resultStatus.value = '';
                     setStatus('已清空');
                 }
 
-                function goHome() {
-                    window.location.href = '/index.html';
-                }
-
                 function onKeydown(e) {
                     if ((e.ctrlKey && e.shiftKey && e.key === 'F') || (e.ctrlKey && e.altKey && e.key === 'l')) {
                         e.preventDefault();
-                        formatJson();
+                        formatJs();
                     }
                     if (e.ctrlKey && e.shiftKey && e.key === 'M') {
                         e.preventDefault();
-                        compressJson();
+                        minifyJs();
                     }
                 }
 
+                function goHome() {
+                    window.location.href = '/';
+                }
+
+                function adjustSize() {
+                    nextTick(function () {
+                        var ta = inputArea.value;
+                        var lines = inputLines.value;
+                        if (!ta) return;
+                        ta.style.minHeight = '';
+                        ta.style.minWidth = '';
+                        if (lines) lines.style.minHeight = '';
+
+                        var parent = ta.parentElement;
+                        var sty = getComputedStyle(ta);
+                        var padV = parseFloat(sty.paddingTop) + parseFloat(sty.paddingBottom);
+                        var padH = parseFloat(sty.paddingLeft) + parseFloat(sty.paddingRight);
+
+                        // content size = scroll size minus own padding
+                        var contentH = ta.scrollHeight - padV;
+                        var contentW = ta.scrollWidth - padH;
+
+                        // available space inside parent, minus textarea's own padding
+                        var availH = parent.clientHeight - padV;
+                        var availW = parent.clientWidth - padH;
+
+                        // only enlarge when content actually overflows
+                        if (contentH > availH) {
+                            ta.style.minHeight = contentH + 'px';
+                            if (lines) lines.style.minHeight = contentH + 'px';
+                        }
+                        if (contentW > availW) {
+                            ta.style.minWidth = contentW + 'px';
+                        }
+                    });
+                }
+
+                watch(jsText, adjustSize);
+
+                onMounted(function () {
+                    adjustSize();
+                });
+
                 return {
-                    jsonText,
+                    jsText,
                     resultText,
                     errorMsg,
                     statusText,
                     resultStatus,
-                    autoFormat,
+                    indentSize,
+                    inputArea,
+                    inputLines,
                     inputCharCount,
                     inputLineCount,
                     inputSizeText,
@@ -453,10 +479,8 @@
                     resultLineCount,
                     resultSizeText,
                     resultLineNumbers,
-                    formatJson,
-                    compressJson,
-                    escapeJson,
-                    unescapeJson,
+                    formatJs,
+                    minifyJs,
                     copyResult,
                     clearAll,
                     goHome,
@@ -468,8 +492,6 @@
         // Register Element Plus icons
         app.component('edit-icon', ElementPlusIconsVue.Edit);
         app.component('switch-icon', ElementPlusIconsVue.Switch);
-        app.component('d-arrow-right-icon', ElementPlusIconsVue.DArrowRight);
-        app.component('d-arrow-left-icon', ElementPlusIconsVue.DArrowLeft);
         app.component('document-copy-icon', ElementPlusIconsVue.DocumentCopy);
         app.component('delete-icon', ElementPlusIconsVue.Delete);
         app.component('home-filled-icon', ElementPlusIconsVue.HomeFilled);
