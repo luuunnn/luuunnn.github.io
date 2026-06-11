@@ -85,7 +85,7 @@ jobs: # 定义工作流中的作业列表
               entries.append(f.stem)
 
           lines.append("</urlset>")
-          output_path = pages_dir / "sitemap.xml"
+          output_path = pathlib.Path("sitemap.xml")
           output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
           print(f"\nGenerated {output_path} with {len(entries)} entries: {entries}")
           print(output_path.read_text(encoding="utf-8"))

@@ -334,12 +334,12 @@
                     '<div class="empty-icon">&#9888;</div>' +
                     '<p>加载页面清单失败</p>' +
                     '<p class="hint">' + msg + '</p>' +
-                    '<p class="hint" style="margin-top:8px;">请检查 pages/sitemap.xml 是否存在且格式正确</p>' +
+                    '<p class="hint" style="margin-top:8px;">请检查 sitemap.xml 是否存在且格式正确</p>' +
                     '</div>';
                 pageCountEl.textContent = '-';
             }
 
-            fetch('pages/sitemap.xml', { cache: 'no-cache' })
+            fetch('/sitemap.xml', { cache: 'no-cache' })
                 .then(function (res) {
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     return res.text();
