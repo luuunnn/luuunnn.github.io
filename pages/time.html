@@ -386,7 +386,7 @@
             </div>
 
             <div class="time-toolbar">
-                <el-button @click="goHome" text><el-icon><home-filled-icon></el-icon></el-icon>&nbsp;返回首页</el-button>
+                <el-button @click="goHome" text><el-icon><home-filled-icon></home-filled-icon></el-icon>&nbsp;返回首页</el-button>
             </div>
 
             <div class="time-cards">
@@ -539,6 +539,7 @@
                                         <el-button size="small" @click="setLast7Days">最近7天</el-button>
                                         <el-button size="small" @click="setLast30Days">最近30天</el-button>
                                         <el-button size="small" @click="setLast90Days">最近90天</el-button>
+                                        <el-button size="small" @click="setYouyouBirthday">🎂 宥宥生日</el-button>
                                     </div>
                                 </div>
 
@@ -548,8 +549,8 @@
                                         format="YYYY-MM-DD" value-format="YYYY-MM-DD"
                                         style="width:200px;"></el-date-picker>
                                     <span class="diff-swap-btn" @click="swapDates" title="交换日期">⇄</span>
-                                    <span class="label-text">结束</span>
-                                    <el-date-picker v-model="diffEnd" type="date" placeholder="结束日期" format="YYYY-MM-DD"
+                                    <span class="label-text">截止</span>
+                                    <el-date-picker v-model="diffEnd" type="date" placeholder="截止日期" format="YYYY-MM-DD"
                                         value-format="YYYY-MM-DD" style="width:200px;"></el-date-picker>
                                 </div>
 
@@ -564,13 +565,17 @@
                                             <el-radio-button value="seconds">秒</el-radio-button>
                                         </el-radio-group>
                                     </div>
-                                    <el-checkbox v-model="diffInclusive" size="small">包含结束日期</el-checkbox>
+                                    <el-checkbox v-model="diffInclusive" size="small">包含截止日期</el-checkbox>
                                 </div>
 
                                 <div class="time-result-area">
-                                    <div class="time-result-label">计算结果</div>
+                                    <div class="time-result-label">计算结果
+                                        <span style="font-weight:400;color:#909399;margin-left:8px;">
+                                            （{{ diffInclusive ? '含开始和截止，如 1月1日→1月3日 = 3天' : '含开始不含截止，如 1月1日→1月3日 = 2天（截止日期为第3天）' }}）
+                                        </span>
+                                    </div>
                                     <div class="time-result-value" :class="{ placeholder: !dateDiffText }">
-                                        {{ dateDiffText || '请选择开始日期和结束日期' }}
+                                        {{ dateDiffText || '请选择开始日期和截止日期' }}
                                     </div>
                                     <div class="diff-result-detail" v-if="dateDiffText">
                                         {{ dateDiffDetail }}
@@ -582,7 +587,6 @@
                                     </div>
                                 </div>
                             </div>
-                </div>
                 </el-tab-pane>
                 </el-tabs>
             </div>
@@ -799,7 +803,7 @@
 
                     let detail = parts.join(' ');
                     if (r.sign < 0) {
-                        detail += ' （开始日期晚于结束日期）';
+                        detail += ' （开始日期晚于截止日期）';
                     }
                     return detail;
                 });
@@ -862,6 +866,12 @@
                     startDate.setDate(endDate.getDate() - 89);
                     diffStart.value = toDateStr(startDate);
                     diffEnd.value = toDateStr(endDate);
+                }
+
+                function setYouyouBirthday() {
+                    diffStart.value = '2026-03-04';
+                    diffEnd.value = toDateStr(new Date());
+                    diffInclusive.value = true;
                 }
 
                 // === 通用 ===
@@ -944,6 +954,7 @@
                     setLast7Days,
                     setLast30Days,
                     setLast90Days,
+                    setYouyouBirthday,
                     filterTsInput,
                     setFormat,
                     formatType,
