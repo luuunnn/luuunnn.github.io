@@ -262,6 +262,8 @@
                     :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
                 <el-button @click="clearAll" :disabled="!jsonText && !resultText" type="info"
                     plain><el-icon><delete-icon></delete-icon></el-icon>&nbsp;清空</el-button>
+                <el-divider direction="vertical"></el-divider>
+                <el-button @click="donateVisible = true" type="warning" plain size="small">💜 打赏</el-button>
                 <span style="flex:1"></span>
                 <el-switch v-model="autoFormat" size="small" active-text="处理后自动格式化"></el-switch>
             </div>
@@ -308,6 +310,20 @@
                 <span>{{ statusText }}</span>
             </div>
         </div>
+
+        <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="420px" center>
+            <div style="display:flex;justify-content:center;gap:24px;padding:16px 0;">
+                <div style="text-align:center;">
+                    <img src="/assets/images/donate-wechat.png" style="width:150px;height:150px;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
+                    <p style="font-size:13px;color:#909399;margin-top:8px;">微信</p>
+                </div>
+                <div style="text-align:center;">
+                    <img src="/assets/images/donate-alipay.png" style="width:150px;height:150px;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
+                    <p style="font-size:13px;color:#909399;margin-top:8px;">支付宝</p>
+                </div>
+            </div>
+        </el-dialog>
+
     </div>
 
     <div class="donate-section">
@@ -339,6 +355,7 @@
                 const statusText = ref('');
                 const resultStatus = ref('');
                 const autoFormat = ref(true);
+                const donateVisible = ref(false);
 
                 const inputCharCount = computed(function () { return jsonText.value.length; });
                 const inputLineCount = computed(function () {
@@ -504,6 +521,7 @@
                     statusText,
                     resultStatus,
                     autoFormat,
+                    donateVisible,
                     inputCharCount,
                     inputLineCount,
                     inputSizeText,
