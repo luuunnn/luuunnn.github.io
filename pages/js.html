@@ -27,10 +27,17 @@
 
         .js-header {
             margin-bottom: 12px;
+            padding-left: 20px;
+        }
+
+        .js-header .title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
         }
 
         .js-header h3 {
-            margin: 0 0 4px 0;
+            margin: 0;
             font-size: 20px;
             color: #303133;
         }
@@ -41,17 +48,11 @@
             font-size: 13px;
         }
 
-        .js-toolbar {
+        .js-panel-actions {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
             align-items: center;
-        }
-
-        .js-toolbar .el-divider--vertical {
-            height: 24px;
-            margin: 0 4px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .js-panels {
@@ -252,9 +253,11 @@
             align-items: center;
             justify-content: center;
         }
+
         .el-dialog {
             margin-top: 0 !important;
         }
+
         .donate-content {
             display: flex;
             justify-content: center;
@@ -266,6 +269,7 @@
             box-sizing: border-box;
             overflow: hidden;
         }
+
         .donate-img-col {
             text-align: center;
             display: flex;
@@ -275,6 +279,7 @@
             height: 100%;
             overflow: hidden;
         }
+
         .donate-img-col img {
             max-width: 290px;
             max-height: calc(100% - 36px);
@@ -287,6 +292,7 @@
             padding: 8px;
             background: #fff;
         }
+
         .donate-img-col p {
             font-size: 15px;
             color: #909399;
@@ -300,28 +306,12 @@
     <div id="app">
         <div class="js-tool">
             <div class="js-header">
-                <h3>JS 工具</h3>
-                <p>在左侧输入 JavaScript 代码，使用下方按钮操作，结果将显示在右侧</p>
-            </div>
-
-            <div class="js-toolbar">
-                <el-button @click="goHome" text><el-icon><home-filled-icon></el-icon></el-icon>&nbsp;返回首页</el-button>
-                <el-divider direction="vertical"></el-divider>
-                <el-button type="primary"
-                    @click="formatJs"><el-icon><edit-icon></edit-icon></el-icon>&nbsp;格式化</el-button>
-                <el-button type="success"
-                    @click="minifyJs"><el-icon><switch-icon></switch-icon></el-icon>&nbsp;压缩</el-button>
-                <el-divider direction="vertical"></el-divider>
-                <el-button @click="copyResult"
-                    :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
-                <el-button @click="clearAll" :disabled="!jsText && !resultText" type="info"
-                    plain><el-icon><delete-icon></delete-icon></el-icon>&nbsp;清空</el-button>
-                <span style="flex:1"></span>
-                <span style="font-size:12px;color:#909399;display:flex;align-items:center;gap:4px;">
-                    缩进
-                    <el-input-number v-model="indentSize" :min="1" :max="8" size="small"
-                        style="width:80px;"></el-input-number>
-                </span>
+                <div class="title-row">
+                    <h3>JS 工具</h3>
+                    <p>在左侧输入 JavaScript 代码，结果将显示在右侧</p>
+                </div>
+                <el-button @click="goHome" text
+                    style="padding-left:0"><el-icon><home-filled-icon></home-filled-icon></el-icon>&nbsp;返回首页</el-button>
             </div>
 
             <div class="js-panels">
@@ -339,7 +329,17 @@
                     </div>
                 </div>
                 <div class="js-panel js-panel-input">
-                    <div class="js-panel-header">输入</div>
+                    <div class="js-panel-header">
+                        <span>输入</span>
+                        <div class="js-panel-actions">
+                            <el-button type="primary" size="small"
+                                @click="formatJs"><el-icon><edit-icon></edit-icon></el-icon>&nbsp;格式化</el-button>
+                            <el-button type="success" size="small"
+                                @click="minifyJs"><el-icon><switch-icon></switch-icon></el-icon>&nbsp;压缩</el-button>
+                            <el-button size="small" @click="clearAll" :disabled="!jsText && !resultText" type="info"
+                                plain><el-icon><delete-icon></delete-icon></el-icon>&nbsp;清空</el-button>
+                        </div>
+                    </div>
                     <div class="js-panel-body">
                         <div class="code-viewer">
                             <pre class="code-lines" ref="inputLines">{{ inputLineNumbers }}</pre>
@@ -351,8 +351,15 @@
                 </div>
                 <div class="js-panel js-panel-output">
                     <div class="js-panel-header">
-                        结果
+                        <span>结果</span>
                         <span style="font-weight:400;color:#c0c4cc;font-size:12px;">{{ resultStatus }}</span>
+                        <el-button size="small" @click="copyResult"
+                            :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
+                        <span style="margin-left:auto;font-size:12px;color:#909399;display:flex;align-items:center;gap:4px;">
+                            缩进
+                            <el-input-number v-model="indentSize" :min="1" :max="8" size="small"
+                                style="width:70px;"></el-input-number>
+                        </span>
                     </div>
                     <div class="js-panel-body">
                         <div class="code-viewer" v-if="resultText">
