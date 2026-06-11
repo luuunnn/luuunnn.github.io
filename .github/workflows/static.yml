@@ -90,7 +90,6 @@ jobs: # 定义工作流中的作业列表
           print(f"\nGenerated {output_path} with {len(entries)} entries: {entries}")
           print(output_path.read_text(encoding="utf-8"))
           PYEOF
-          PYEOF
 
       - name: Setup Pages # 步骤3：配置 GitHub Pages
         uses: actions/configure-pages@v5 # 自动检测和配置 Pages 的构建方式
