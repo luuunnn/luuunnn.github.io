@@ -32,51 +32,64 @@ jobs: # 定义工作流中的作业列表
       - name: Checkout # 步骤1：检出代码
         uses: actions/checkout@v4 # 使用官方 checkout 动作，将仓库代码拉取到运行环境中
 
-      - name: Generate sitemap.json # 步骤2：扫描 pages/ 目录自动生成站点地图
+      - name: Generate sitemap.xml # 扫描 pages/ 目录生成 Google SEO 站点地图
         shell: bash
         run: |
           python3 <<'PYEOF'
-          import html, json, pathlib, re
+          import html, pathlib, re
+          from datetime import datetime, timezone
+          from xml.sax.saxutils import escape as xml_escape
 
           pages_dir = pathlib.Path("pages")
-          sitemap = []
+          BASE_URL = "https://luuunnn.github.io"
+          NS_PAGE = "https://luuunnn.github.io/sitemap-ext"
 
-          for f in sorted(pages_dir.glob("*.html")):
-              content = f.read_text(encoding="utf-8")
-
-              # 提取 <title>（支持跨行，去除首尾空白）
-              title = ""
+          def extract_title(content, fallback_stem):
               m = re.search(r"<title[^>]*>(.*?)</title>", content, re.DOTALL | re.IGNORECASE)
               if m:
-                  title = html.unescape(m.group(1).strip())
+                  return html.unescape(m.group(1).strip())
+              return fallback_stem
 
-              # 兜底：用文件名（不含扩展名）
-              if not title:
-                  title = f.stem
-
-              # 提取 <meta name="description" content="...">
-              # 兼容 name/content 任意顺序
-              description = ""
-              for attr_order in [
+          def extract_description(content):
+              for pattern in [
                   r'<meta[^>]+name=["\x27]description["\x27][^>]+content=["\x27]([^"\x27]*)["\x27]',
                   r'<meta[^>]+content=["\x27]([^"\x27]*)["\x27][^>]+name=["\x27]description["\x27]',
               ]:
-                  m = re.search(attr_order, content, re.IGNORECASE)
+                  m = re.search(pattern, content, re.IGNORECASE)
                   if m:
-                      description = html.unescape(m.group(1).strip())
-                      break
+                      return html.unescape(m.group(1).strip())
+              return ""
 
+          now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+          entries = []
+          lines = ['<?xml version="1.0" encoding="UTF-8"?>']
+          lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"')
+          lines.append(f'         xmlns:page="{NS_PAGE}">')
+
+          for f in sorted(pages_dir.glob("*.html")):
+              content = f.read_text(encoding="utf-8")
+              title = extract_title(content, f.stem)
+              description = extract_description(content)
               print(f"  {f.name}: title=[{title}] desc=[{description}]")
-              sitemap.append({
-                  "name": title,
-                  "url": f"pages/{f.name}",
-                  "description": description,
-              })
 
-          output_path = pages_dir / "sitemap.json"
-          output_path.write_text(json.dumps(sitemap, ensure_ascii=False, indent=2), encoding="utf-8")
-          print(f"\nGenerated {output_path} with {len(sitemap)} entries:")
+              lines.append("  <url>")
+              lines.append(f"    <loc>{BASE_URL}/pages/{f.name}</loc>")
+              lines.append(f"    <lastmod>{now}</lastmod>")
+              lines.append("    <changefreq>monthly</changefreq>")
+              lines.append("    <priority>0.8</priority>")
+              # 前端渲染需要 title/description，通过自定义命名空间携带
+              # Google 会忽略未知命名空间元素，不影响 SEO
+              lines.append(f"    <page:name>{xml_escape(title)}</page:name>")
+              lines.append(f"    <page:description>{xml_escape(description)}</page:description>")
+              lines.append("  </url>")
+              entries.append(f.stem)
+
+          lines.append("</urlset>")
+          output_path = pages_dir / "sitemap.xml"
+          output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+          print(f"\nGenerated {output_path} with {len(entries)} entries: {entries}")
           print(output_path.read_text(encoding="utf-8"))
+          PYEOF
           PYEOF
 
       - name: Setup Pages # 步骤3：配置 GitHub Pages

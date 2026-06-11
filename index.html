@@ -295,6 +295,7 @@
         (function () {
             var grid = document.getElementById('pageGrid');
             var pageCountEl = document.getElementById('pageCount');
+            var NS_PAGE = 'https://luuunnn.github.io/sitemap-ext';
 
             function renderCards(pages) {
                 grid.innerHTML = '';
@@ -304,7 +305,7 @@
                         '<div class="empty-state">' +
                         '<div class="empty-icon">&#128450;</div>' +
                         '<p>暂无工具页面</p>' +
-                        '<p class="hint">在 pages/sitemap.json 中添加页面即可在此显示</p>' +
+                        '<p class="hint">在 pages/ 目录下添加 HTML 文件即可在此显示</p>' +
                         '</div>';
                     pageCountEl.textContent = '0';
                     return;
@@ -333,19 +334,45 @@
                     '<div class="empty-icon">&#9888;</div>' +
                     '<p>加载页面清单失败</p>' +
                     '<p class="hint">' + msg + '</p>' +
-                    '<p class="hint" style="margin-top:8px;">请检查 pages/sitemap.json 是否存在且格式正确</p>' +
+                    '<p class="hint" style="margin-top:8px;">请检查 pages/sitemap.xml 是否存在且格式正确</p>' +
                     '</div>';
                 pageCountEl.textContent = '-';
             }
 
-            fetch('pages/sitemap.json', { cache: 'no-cache' })
+            fetch('pages/sitemap.xml', { cache: 'no-cache' })
                 .then(function (res) {
                     if (!res.ok) throw new Error('HTTP ' + res.status);
-                    return res.json();
+                    return res.text();
                 })
-                .then(function (data) {
-                    if (!Array.isArray(data)) throw new Error('sitemap.json 应为数组格式');
-                    renderCards(data);
+                .then(function (xmlText) {
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(xmlText, 'text/xml');
+
+                    // 检查 XML 解析错误
+                    var parseError = doc.querySelector('parsererror');
+                    if (parseError) {
+                        throw new Error('XML 解析失败');
+                    }
+
+                    var urlEls = doc.querySelectorAll('url');
+                    var pages = [];
+                    urlEls.forEach(function (urlEl) {
+                        var locEl = urlEl.querySelector('loc');
+                        var nameEls = urlEl.getElementsByTagNameNS(NS_PAGE, 'name');
+                        var descEls = urlEl.getElementsByTagNameNS(NS_PAGE, 'description');
+
+                        var fullUrl = locEl ? locEl.textContent.trim() : '';
+                        // 从完整 URL 提取相对路径
+                        var relUrl = fullUrl.replace(/^https?:\/\/[^\/]+/, '');
+
+                        pages.push({
+                            name: nameEls.length ? nameEls[0].textContent.trim() : '',
+                            url: relUrl,
+                            description: descEls.length ? descEls[0].textContent.trim() : ''
+                        });
+                    });
+
+                    renderCards(pages);
                 })
                 .catch(function (err) {
                     renderError(err.message);
