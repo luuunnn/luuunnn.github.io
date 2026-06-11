@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间戳转换</title>
+    <meta name="description" content="在线时间戳转换工具，支持日期/时间转时间戳，以及时间戳转格式化日期，支持自定义日期格式。">
+    <meta name="keywords" content="时间戳转换,Unix时间戳,日期转时间戳,时间戳转日期,开发者工具">
+    <link rel="stylesheet" href="/assets/libs/element-plus/element-plus.index.css">
+    <style>
+        body {
+            margin: 0;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .time-tool {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .time-header {
+            margin-bottom: 12px;
+        }
+
+        .time-header h3 {
+            margin: 0 0 4px 0;
+            font-size: 20px;
+            color: #303133;
+        }
+
+        .time-header p {
+            margin: 0;
+            color: #909399;
+            font-size: 13px;
+        }
+
+        .time-toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .time-cards {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .time-card {
+            flex: 1;
+            min-width: 0;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e4e7ed;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .time-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #303133;
+            margin: 0 0 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .time-card-title .title-icon {
+            color: #409eff;
+            font-size: 18px;
+        }
+
+        .time-form-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .time-form-row .label-text {
+            font-size: 13px;
+            color: #606266;
+            white-space: nowrap;
+            min-width: 40px;
+        }
+
+        .time-result-area {
+            margin-top: auto;
+            background: #f5f7fa;
+            border-radius: 6px;
+            padding: 16px;
+            border: 1px solid #e4e7ed;
+        }
+
+        .time-result-label {
+            font-size: 12px;
+            color: #909399;
+            margin-bottom: 8px;
+        }
+
+        .time-result-value {
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 20px;
+            color: #303133;
+            word-break: break-all;
+            margin-bottom: 8px;
+            min-height: 28px;
+            line-height: 1.4;
+        }
+
+        .time-result-value.placeholder {
+            color: #c0c4cc;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .time-result-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .format-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .format-presets .el-button {
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+        }
+
+        .time-now-hint {
+            font-size: 12px;
+            color: #909399;
+            margin-left: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .time-now-hint:hover {
+            color: #409eff;
+        }
+
+        .time-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: #909399;
+            border-top: 1px solid #e4e7ed;
+            padding-top: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .time-cards {
+                flex-direction: column;
+            }
+        }
+
+        .donate-sidebar {
+            width: 100px;
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 8px;
+        }
+
+        .donate-sidebar-text {
+            font-size: 12px;
+            color: #909399;
+            letter-spacing: 2px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .donate-sidebar-qrs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .donate-sidebar-qr {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .donate-sidebar-qr:hover {
+            transform: scale(1.05);
+        }
+
+        .donate-sidebar-qr img {
+            width: 72px;
+            height: 72px;
+            border-radius: 4px;
+            border: 1px solid #e8e8e8;
+            padding: 4px;
+            background: #fff;
+            object-fit: contain;
+        }
+
+        .donate-sidebar-qr span {
+            font-size: 11px;
+            color: #c0c4cc;
+        }
+
+        /* 打赏弹框 - 居中，高度70vh最小700px */
+        .el-overlay-dialog {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+        .el-dialog {
+            margin-top: 0 !important;
+        }
+        .donate-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            padding: 16px;
+            height: calc(70vh - 112px);
+            min-height: 588px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .donate-img-col {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow: hidden;
+        }
+        .donate-img-col img {
+            max-width: 290px;
+            max-height: calc(100% - 36px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            padding: 8px;
+            background: #fff;
+        }
+        .donate-img-col p {
+            font-size: 15px;
+            color: #909399;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="time-tool">
+            <div class="time-header">
+                <h3>时间戳转换</h3>
+                <p>日期 ↔ 时间戳 互转，支持秒/毫秒精度，自定义日期格式</p>
+            </div>
+
+            <div class="time-toolbar">
+                <el-button @click="goHome" text><el-icon><home-filled-icon></el-icon></el-icon>&nbsp;返回首页</el-button>
+            </div>
+
+            <div class="time-cards">
+                <div class="donate-sidebar">
+                    <span class="donate-sidebar-text">创作不易<br>打赏一二</span>
+                    <div class="donate-sidebar-qrs">
+                        <div class="donate-sidebar-qr" @click="donateVisible = true">
+                            <img src="/assets/images/donate-wechat.png" alt="微信打赏">
+                            <span>微信</span>
+                        </div>
+                        <div class="donate-sidebar-qr" @click="donateVisible = true">
+                            <img src="/assets/images/donate-alipay.png" alt="支付宝打赏">
+                            <span>支付宝</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- 日期/时间 → 时间戳 -->
+                <div class="time-card">
+                    <p class="time-card-title">
+                        <span class="title-icon">⏱</span> 日期/时间 → 时间戳
+                    </p>
+
+                    <div class="time-form-row">
+                        <span class="label-text">类型</span>
+                        <el-radio-group v-model="dateType" size="small">
+                            <el-radio-button value="date">日期</el-radio-button>
+                            <el-radio-button value="datetime">时间</el-radio-button>
+                        </el-radio-group>
+                        <span class="time-now-hint" @click="setNow">填入当前时间</span>
+                    </div>
+
+                    <div class="time-form-row">
+                        <span class="label-text">选择</span>
+                        <el-date-picker v-model="selectedDate" :type="dateType" :key="dateType"
+                            :placeholder="dateType === 'date' ? '选择日期' : '选择日期时间'" style="width: 240px;">
+                        </el-date-picker>
+                    </div>
+
+                    <div class="time-form-row">
+                        <span class="label-text">精度</span>
+                        <el-radio-group v-model="tsUnit" size="small">
+                            <el-radio-button value="seconds">秒</el-radio-button>
+                            <el-radio-button value="milliseconds">毫秒</el-radio-button>
+                        </el-radio-group>
+                    </div>
+
+                    <div class="time-result-area">
+                        <div class="time-result-label">转换结果</div>
+                        <div class="time-result-value" :class="{ placeholder: !dateTimestamp }">
+                            {{ dateTimestamp || '请选择日期/时间' }}
+                        </div>
+                        <div class="time-result-actions">
+                            <el-button size="small" @click="copyText(dateTimestamp)" :disabled="!dateTimestamp">
+                                <el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制
+                            </el-button>
+                            <span v-if="dateTimestamp && tsUnit === 'milliseconds'"
+                                style="font-size:12px;color:#909399;line-height:32px;margin-left:4px;">
+                                秒: {{ (dateTimestamp / 1000).toFixed(0) }}
+                            </span>
+                            <span v-if="dateTimestamp && tsUnit === 'seconds'"
+                                style="font-size:12px;color:#909399;line-height:32px;margin-left:4px;">
+                                毫秒: {{ (dateTimestamp * 1000).toFixed(0) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 时间戳 → 日期/时间 -->
+                <div class="time-card">
+                    <p class="time-card-title">
+                        <span class="title-icon">📅</span> 时间戳 → 日期/时间
+                    </p>
+
+                    <div class="time-form-row">
+                        <span class="label-text">精度</span>
+                        <el-radio-group v-model="tsInputUnit" size="small">
+                            <el-radio-button value="seconds">秒</el-radio-button>
+                            <el-radio-button value="milliseconds">毫秒</el-radio-button>
+                        </el-radio-group>
+                    </div>
+
+                    <div class="time-form-row">
+                        <span class="label-text">时间戳</span>
+                        <el-input v-model="tsInput" placeholder="输入时间戳数字" style="flex:1;max-width:300px;"
+                            @input="filterTsInput" inputmode="numeric">
+                            <template #append>{{ tsInputUnitLabel }}</template>
+                        </el-input>
+                    </div>
+
+                    <div class="time-form-row" style="align-items:flex-start;">
+                        <span class="label-text" style="margin-top:6px;">格式</span>
+                        <div style="flex:1;min-width:0;">
+                            <el-input v-model="dateFormat" placeholder="yyyy-MM-dd HH:mm:ss" style="max-width:300px;" />
+                            <div class="format-presets" style="margin-top:8px;">
+                                <el-button size="small" @click="setFormat('yyyy-MM-dd')"
+                                    :type="formatType('yyyy-MM-dd')" plain>yyyy-MM-dd</el-button>
+                                <el-button size="small" @click="setFormat('yyyy-MM-dd HH:mm:ss')"
+                                    :type="formatType('yyyy-MM-dd HH:mm:ss')" plain>yyyy-MM-dd HH:mm:ss</el-button>
+                                <el-button size="small" @click="setFormat('yyyy/MM/dd HH:mm:ss')"
+                                    :type="formatType('yyyy/MM/dd HH:mm:ss')" plain>yyyy/MM/dd HH:mm:ss</el-button>
+                                <el-button size="small" @click="setFormat('MM-dd HH:mm')"
+                                    :type="formatType('MM-dd HH:mm')" plain>MM-dd HH:mm</el-button>
+                                <el-button size="small" @click="setFormat('yyyy年MM月dd日 HH:mm:ss')"
+                                    :type="formatType('yyyy年MM月dd日 HH:mm:ss')" plain>中文格式</el-button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="time-result-area">
+                        <div class="time-result-label">转换结果</div>
+                        <div class="time-result-value" :class="{ placeholder: !formattedDate }">
+                            {{ formattedDate || '输入时间戳后自动转换' }}
+                        </div>
+                        <div class="time-result-actions">
+                            <el-button size="small" @click="copyText(formattedDate)" :disabled="!formattedDate">
+                                <el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制
+                            </el-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-footer">
+                <span>当前时区: {{ timezoneText }}</span>
+                <span>{{ statusText }}</span>
+            </div>
+        </div>
+
+        <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="640px" center>
+            <div class="donate-content">
+                <div class="donate-img-col">
+                    <img src="/assets/images/donate-wechat.png" alt="微信打赏">
+                    <p>微信</p>
+                </div>
+                <div class="donate-img-col">
+                    <img src="/assets/images/donate-alipay.png" alt="支付宝打赏">
+                    <p>支付宝</p>
+                </div>
+            </div>
+        </el-dialog>
+
+    </div>
+
+    <script src="/assets/libs/vue/vue.global.prod.js"></script>
+    <script src="/assets/libs/element-plus/element-plus.index.full.min.js"></script>
+    <script src="/assets/libs/element-plus/element-plus.icons.iife.min.js"></script>
+
+    <script type="text/javascript">
+        const { createApp, ref, computed } = Vue;
+
+        const app = createApp({
+            setup() {
+                // === 日期 → 时间戳 ===
+                const dateType = ref('date');
+                const selectedDate = ref(null);
+                const tsUnit = ref('seconds');
+
+                // === 时间戳 → 日期 ===
+                const tsInput = ref('');
+                const tsInputUnit = ref('seconds');
+                const dateFormat = ref('yyyy-MM-dd HH:mm:ss');
+
+                const statusText = ref('');
+                const donateVisible = ref(false);
+
+                const tsInputUnitLabel = computed(function () {
+                    return tsInputUnit.value === 'seconds' ? '秒' : '毫秒';
+                });
+
+                const timezoneText = computed(function () {
+                    const offset = -new Date().getTimezoneOffset();
+                    const sign = offset >= 0 ? '+' : '-';
+                    const hours = Math.floor(Math.abs(offset) / 60);
+                    const mins = Math.abs(offset) % 60;
+                    return 'UTC' + sign + String(hours).padStart(2, '0') + ':' + String(mins).padStart(2, '0');
+                });
+
+                // 日期 → 时间戳（实时计算）
+                const dateTimestamp = computed(function () {
+                    if (!selectedDate.value) return '';
+                    const ts = selectedDate.value.getTime();
+                    if (tsUnit.value === 'seconds') {
+                        return Math.floor(ts / 1000).toString();
+                    }
+                    return ts.toString();
+                });
+
+                // 解析时间戳输入
+                function parseTsInput() {
+                    const raw = tsInput.value.trim();
+                    if (!raw) return NaN;
+                    // 支持纯数字，也支持带空格
+                    const num = Number(raw.replace(/[,_\s]/g, ''));
+                    if (isNaN(num)) return NaN;
+                    if (tsInputUnit.value === 'seconds') {
+                        return num * 1000;
+                    }
+                    return num;
+                }
+
+                // 格式化函数
+                function formatDate(date, format) {
+                    if (!date || isNaN(date.getTime())) return '';
+                    const y = date.getFullYear();
+                    const M = date.getMonth() + 1;
+                    const d = date.getDate();
+                    const H = date.getHours();
+                    const m = date.getMinutes();
+                    const s = date.getSeconds();
+
+                    const pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+
+                    return format
+                        .replace(/yyyy/g, y)
+                        .replace(/YYYY/g, y)
+                        .replace(/yy/g, String(y).slice(-2))
+                        .replace(/YY/g, String(y).slice(-2))
+                        .replace(/MM/g, pad(M))
+                        .replace(/dd/g, pad(d))
+                        .replace(/DD/g, pad(d))
+                        .replace(/HH/g, pad(H))
+                        .replace(/hh/g, pad(H > 12 ? H - 12 : H))
+                        .replace(/mm/g, pad(m))
+                        .replace(/ss/g, pad(s))
+                        .replace(/M/g, M)
+                        .replace(/d/g, d)
+                        .replace(/D/g, d)
+                        .replace(/H/g, H)
+                        .replace(/h/g, H > 12 ? H - 12 : H)
+                        .replace(/m/g, m)
+                        .replace(/s/g, s);
+                }
+
+                // 时间戳 → 日期（实时计算）
+                const formattedDate = computed(function () {
+                    const ts = parseTsInput();
+                    if (isNaN(ts)) return '';
+                    const fmt = dateFormat.value || 'yyyy-MM-dd HH:mm:ss';
+                    return formatDate(new Date(ts), fmt);
+                });
+
+                function setNow() {
+                    selectedDate.value = new Date();
+                }
+
+                function filterTsInput() {
+                    var val = tsInput.value;
+                    val = val.replace(/[^\d-]/g, '');
+                    var hasMinus = val.startsWith('-');
+                    val = val.replace(/-/g, '');
+                    if (hasMinus) val = '-' + val;
+                    tsInput.value = val;
+                }
+
+                function setFormat(fmt) {
+                    dateFormat.value = fmt;
+                }
+
+                function formatType(fmt) {
+                    return dateFormat.value === fmt ? 'primary' : '';
+                }
+
+                function copyText(text) {
+                    if (!text) return;
+                    navigator.clipboard.writeText(text).then(function () {
+                        statusText.value = '已复制到剪贴板';
+                        ElementPlus.ElMessage.success('已复制到剪贴板');
+                        setTimeout(function () { statusText.value = ''; }, 2000);
+                    }).catch(function () {
+                        ElementPlus.ElMessage.error('复制失败，请手动复制');
+                    });
+                }
+
+                function goHome() {
+                    window.location.href = '/index.html';
+                }
+
+                return {
+                    dateType,
+                    selectedDate,
+                    tsUnit,
+                    tsInput,
+                    tsInputUnit,
+                    dateFormat,
+                    statusText,
+                    donateVisible,
+                    tsInputUnitLabel,
+                    timezoneText,
+                    dateTimestamp,
+                    formattedDate,
+                    setNow,
+                    filterTsInput,
+                    setFormat,
+                    formatType,
+                    copyText,
+                    goHome
+                };
+            }
+        });
+
+        // Register Element Plus icons
+        app.component('home-filled-icon', ElementPlusIconsVue.HomeFilled);
+        app.component('document-copy-icon', ElementPlusIconsVue.DocumentCopy);
+
+        app.use(ElementPlus);
+        app.mount('#app');
+    </script>
+</body>
+
+</html>
