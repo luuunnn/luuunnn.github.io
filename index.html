@@ -319,7 +319,7 @@
                     var descAttr = page.description ? ' title="' + page.description.replace(/"/g, '&quot;') + '"' : '';
                     var descHtml = page.description ? '<div class="card-description"' + descAttr + '>' + page.description + '</div>' : '';
                     html +=
-                        '<a class="page-card" href="' + page.url + '" target="_blank">' +
+                        '<a class="page-card" href="' + page.url + '">' +
                         '<div class="card-name">' + (page.name || '') + '</div>' +
                         descHtml +
                         '<span class="card-url">' + (page.url || '') + '</span>' +
