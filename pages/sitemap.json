@@ -1,10 +1,11 @@
 [
-    {
-        "name": "JSON 工具",
-        "url": "pages/json.html"
-    },
-    {
-        "name": "JS 工具",
-        "url": "pages/js.html"
-    }
+  {
+    "name": "JSON",
+    "url": "pages/json.html",
+    "description": "在线JSON工具 - 提供格式化、压缩、验证和转换等功能，帮助用户轻松处理JSON数据，提高工作效率。"
+  },
+  {
+    "name": "JS",
+    "url": "pages/js.html"
+  }
 ]
