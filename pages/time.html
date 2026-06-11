@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>时间戳转换</title>
-    <meta name="description" content="在线时间戳转换工具，支持日期/时间转时间戳，以及时间戳转格式化日期，支持自定义日期格式。">
-    <meta name="keywords" content="时间戳转换,Unix时间戳,日期转时间戳,时间戳转日期,开发者工具">
+    <title>时间工具</title>
+    <meta name="description" content="在线时间工具，支持时间戳转换、日期差值计算等，开发者及日常工作必备。">
+    <meta name="keywords" content="时间戳转换,Unix时间戳,日期转时间戳,时间戳转日期,日期差值计算,日期相差天数,开发者工具">
     <link rel="stylesheet" href="/assets/libs/element-plus/element-plus.index.css">
     <style>
         body {
@@ -45,7 +45,7 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             align-items: center;
         }
 
@@ -129,17 +129,13 @@
         .time-result-actions {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         .format-presets {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-        }
-
-        .format-presets .el-button {
-            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
-            font-size: 12px;
         }
 
         .time-now-hint {
@@ -165,12 +161,84 @@
             padding-top: 12px;
         }
 
-        @media (max-width: 768px) {
-            .time-cards {
-                flex-direction: column;
-            }
+        /* === Tabs wrapper === */
+        .time-tabs-wrapper {
+            flex: 1;
+            min-width: 0;
         }
 
+        .time-cards-inner {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* === Date diff === */
+        .time-diff-card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e4e7ed;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .diff-date-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .diff-swap-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid #dcdfe6;
+            background: #fff;
+            font-size: 16px;
+            color: #606266;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .diff-swap-btn:hover {
+            color: #409eff;
+            border-color: #c6e2ff;
+            background: #ecf5ff;
+        }
+
+        .diff-quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .diff-options {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .diff-result-detail {
+            font-size: 13px;
+            color: #909399;
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+
+        .diff-result-sign {
+            color: #e6a23c;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* === Donate === */
         .donate-sidebar {
             width: 100px;
             min-width: 100px;
@@ -225,15 +293,6 @@
             color: #c0c4cc;
         }
 
-        /* 打赏弹框 - 居中，高度70vh最小700px */
-        .el-overlay-dialog {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-        }
-        .el-dialog {
-            margin-top: 0 !important;
-        }
         .donate-content {
             display: flex;
             justify-content: center;
@@ -245,6 +304,7 @@
             box-sizing: border-box;
             overflow: hidden;
         }
+
         .donate-img-col {
             text-align: center;
             display: flex;
@@ -254,6 +314,7 @@
             height: 100%;
             overflow: hidden;
         }
+
         .donate-img-col img {
             max-width: 290px;
             max-height: calc(100% - 36px);
@@ -266,11 +327,52 @@
             padding: 8px;
             background: #fff;
         }
+
         .donate-img-col p {
             font-size: 15px;
             color: #909399;
             margin-top: 8px;
             flex-shrink: 0;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 768px) {
+            .time-cards {
+                flex-direction: column;
+            }
+
+            .time-cards-inner {
+                flex-direction: column;
+            }
+
+            .diff-date-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .diff-swap-btn {
+                align-self: center;
+                transform: rotate(90deg);
+            }
+
+            .diff-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .donate-sidebar {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                padding: 8px;
+                gap: 16px;
+            }
+
+            .donate-sidebar-qrs {
+                flex-direction: row;
+                margin-top: 0;
+            }
         }
     </style>
 </head>
@@ -279,8 +381,8 @@
     <div id="app">
         <div class="time-tool">
             <div class="time-header">
-                <h3>时间戳转换</h3>
-                <p>日期 ↔ 时间戳 互转，支持秒/毫秒精度，自定义日期格式</p>
+                <h3>时间工具</h3>
+                <p>时间戳转换 · 日期差值计算 · 更多工具陆续添加</p>
             </div>
 
             <div class="time-toolbar">
@@ -301,130 +403,209 @@
                         </div>
                     </div>
                 </div>
-                <!-- 日期/时间 → 时间戳 -->
-                <div class="time-card">
-                    <p class="time-card-title">
-                        <span class="title-icon">⏱</span> 日期/时间 → 时间戳
-                    </p>
 
-                    <div class="time-form-row">
-                        <span class="label-text">类型</span>
-                        <el-radio-group v-model="dateType" size="small">
-                            <el-radio-button value="date">日期</el-radio-button>
-                            <el-radio-button value="datetime">时间</el-radio-button>
-                        </el-radio-group>
-                        <span class="time-now-hint" @click="setNow">填入当前时间</span>
-                    </div>
+                <div class="time-tabs-wrapper">
+                    <el-tabs v-model="activeTab">
+                        <!-- Tab 1: 时间戳转换 -->
+                        <el-tab-pane label="时间戳转换" name="timestamp">
+                            <div class="time-cards-inner">
+                                <!-- 日期/时间 → 时间戳 -->
+                                <div class="time-card">
+                                    <p class="time-card-title">
+                                        <span class="title-icon">⏱</span> 日期/时间 → 时间戳
+                                    </p>
 
-                    <div class="time-form-row">
-                        <span class="label-text">选择</span>
-                        <el-date-picker v-model="selectedDate" :type="dateType" :key="dateType"
-                            :placeholder="dateType === 'date' ? '选择日期' : '选择日期时间'" style="width: 240px;">
-                        </el-date-picker>
-                    </div>
+                                    <div class="time-form-row">
+                                        <span class="label-text">类型</span>
+                                        <el-radio-group v-model="dateType" size="small">
+                                            <el-radio-button value="date">日期</el-radio-button>
+                                            <el-radio-button value="datetime">时间</el-radio-button>
+                                        </el-radio-group>
+                                        <span class="time-now-hint" @click="setNow">填入当前时间</span>
+                                    </div>
 
-                    <div class="time-form-row">
-                        <span class="label-text">精度</span>
-                        <el-radio-group v-model="tsUnit" size="small">
-                            <el-radio-button value="seconds">秒</el-radio-button>
-                            <el-radio-button value="milliseconds">毫秒</el-radio-button>
-                        </el-radio-group>
-                    </div>
+                                    <div class="time-form-row">
+                                        <span class="label-text">选择</span>
+                                        <el-date-picker v-model="selectedDate" :type="dateType" :key="dateType"
+                                            :placeholder="dateType === 'date' ? '选择日期' : '选择日期时间'"
+                                            style="width: 240px;">
+                                        </el-date-picker>
+                                    </div>
 
-                    <div class="time-result-area">
-                        <div class="time-result-label">转换结果</div>
-                        <div class="time-result-value" :class="{ placeholder: !dateTimestamp }">
-                            {{ dateTimestamp || '请选择日期/时间' }}
-                        </div>
-                        <div class="time-result-actions">
-                            <el-button size="small" @click="copyText(dateTimestamp)" :disabled="!dateTimestamp">
-                                <el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制
-                            </el-button>
-                            <span v-if="dateTimestamp && tsUnit === 'milliseconds'"
-                                style="font-size:12px;color:#909399;line-height:32px;margin-left:4px;">
-                                秒: {{ (dateTimestamp / 1000).toFixed(0) }}
-                            </span>
-                            <span v-if="dateTimestamp && tsUnit === 'seconds'"
-                                style="font-size:12px;color:#909399;line-height:32px;margin-left:4px;">
-                                毫秒: {{ (dateTimestamp * 1000).toFixed(0) }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                                    <div class="time-form-row">
+                                        <span class="label-text">精度</span>
+                                        <el-radio-group v-model="tsUnit" size="small">
+                                            <el-radio-button value="seconds">秒</el-radio-button>
+                                            <el-radio-button value="milliseconds">毫秒</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
 
-                <!-- 时间戳 → 日期/时间 -->
-                <div class="time-card">
-                    <p class="time-card-title">
-                        <span class="title-icon">📅</span> 时间戳 → 日期/时间
-                    </p>
+                                    <div class="time-result-area">
+                                        <div class="time-result-label">转换结果</div>
+                                        <div class="time-result-value" :class="{ placeholder: !dateTimestamp }">
+                                            {{ dateTimestamp || '请选择日期/时间' }}
+                                        </div>
+                                        <div class="time-result-actions">
+                                            <el-button size="small" @click="copyText(dateTimestamp)"
+                                                :disabled="!dateTimestamp">
+                                                <el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制
+                                            </el-button>
+                                            <span v-if="dateTimestamp && tsUnit === 'milliseconds'"
+                                                style="font-size:12px;color:#909399;line-height:32px;margin-left:4px;">
+                                                秒: {{ (dateTimestamp / 1000).toFixed(0) }}
+                                            </span>
+                                            <span v-if="dateTimestamp && tsUnit === 'seconds'"
+                                                style="font-size:12px;color:#909399;line-height:32px;margin-left:4px;">
+                                                毫秒: {{ (dateTimestamp * 1000).toFixed(0) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div class="time-form-row">
-                        <span class="label-text">精度</span>
-                        <el-radio-group v-model="tsInputUnit" size="small">
-                            <el-radio-button value="seconds">秒</el-radio-button>
-                            <el-radio-button value="milliseconds">毫秒</el-radio-button>
-                        </el-radio-group>
-                    </div>
+                                <!-- 时间戳 → 日期/时间 -->
+                                <div class="time-card">
+                                    <p class="time-card-title">
+                                        <span class="title-icon">📅</span> 时间戳 → 日期/时间
+                                    </p>
 
-                    <div class="time-form-row">
-                        <span class="label-text">时间戳</span>
-                        <el-input v-model="tsInput" placeholder="输入时间戳数字" style="flex:1;max-width:300px;"
-                            @input="filterTsInput" inputmode="numeric">
-                            <template #append>{{ tsInputUnitLabel }}</template>
-                        </el-input>
-                    </div>
+                                    <div class="time-form-row">
+                                        <span class="label-text">精度</span>
+                                        <el-radio-group v-model="tsInputUnit" size="small">
+                                            <el-radio-button value="seconds">秒</el-radio-button>
+                                            <el-radio-button value="milliseconds">毫秒</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
 
-                    <div class="time-form-row" style="align-items:flex-start;">
-                        <span class="label-text" style="margin-top:6px;">格式</span>
-                        <div style="flex:1;min-width:0;">
-                            <el-input v-model="dateFormat" placeholder="yyyy-MM-dd HH:mm:ss" style="max-width:300px;" />
-                            <div class="format-presets" style="margin-top:8px;">
-                                <el-button size="small" @click="setFormat('yyyy-MM-dd')"
-                                    :type="formatType('yyyy-MM-dd')" plain>yyyy-MM-dd</el-button>
-                                <el-button size="small" @click="setFormat('yyyy-MM-dd HH:mm:ss')"
-                                    :type="formatType('yyyy-MM-dd HH:mm:ss')" plain>yyyy-MM-dd HH:mm:ss</el-button>
-                                <el-button size="small" @click="setFormat('yyyy/MM/dd HH:mm:ss')"
-                                    :type="formatType('yyyy/MM/dd HH:mm:ss')" plain>yyyy/MM/dd HH:mm:ss</el-button>
-                                <el-button size="small" @click="setFormat('MM-dd HH:mm')"
-                                    :type="formatType('MM-dd HH:mm')" plain>MM-dd HH:mm</el-button>
-                                <el-button size="small" @click="setFormat('yyyy年MM月dd日 HH:mm:ss')"
-                                    :type="formatType('yyyy年MM月dd日 HH:mm:ss')" plain>中文格式</el-button>
+                                    <div class="time-form-row">
+                                        <span class="label-text">时间戳</span>
+                                        <el-input v-model="tsInput" placeholder="输入时间戳数字"
+                                            style="flex:1;max-width:300px;" @input="filterTsInput" inputmode="numeric">
+                                            <template #append>{{ tsInputUnitLabel }}</template>
+                                        </el-input>
+                                    </div>
+
+                                    <div class="time-form-row" style="align-items:flex-start;">
+                                        <span class="label-text" style="margin-top:6px;">格式</span>
+                                        <div style="flex:1;min-width:0;">
+                                            <el-input v-model="dateFormat" placeholder="yyyy-MM-dd HH:mm:ss"
+                                                style="max-width:300px;"></el-input>
+                                            <div class="format-presets" style="margin-top:8px;">
+                                                <el-button size="small" @click="setFormat('yyyy-MM-dd')"
+                                                    :type="formatType('yyyy-MM-dd')" plain>yyyy-MM-dd</el-button>
+                                                <el-button size="small" @click="setFormat('yyyy-MM-dd HH:mm:ss')"
+                                                    :type="formatType('yyyy-MM-dd HH:mm:ss')" plain>yyyy-MM-dd
+                                                    HH:mm:ss</el-button>
+                                                <el-button size="small" @click="setFormat('yyyy/MM/dd HH:mm:ss')"
+                                                    :type="formatType('yyyy/MM/dd HH:mm:ss')" plain>yyyy/MM/dd
+                                                    HH:mm:ss</el-button>
+                                                <el-button size="small" @click="setFormat('MM-dd HH:mm')"
+                                                    :type="formatType('MM-dd HH:mm')" plain>MM-dd HH:mm</el-button>
+                                                <el-button size="small" @click="setFormat('yyyy年MM月dd日 HH:mm:ss')"
+                                                    :type="formatType('yyyy年MM月dd日 HH:mm:ss')" plain>中文格式</el-button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="time-result-area">
+                                        <div class="time-result-label">转换结果</div>
+                                        <div class="time-result-value" :class="{ placeholder: !formattedDate }">
+                                            {{ formattedDate || '输入时间戳后自动转换' }}
+                                        </div>
+                                        <div class="time-result-actions">
+                                            <el-button size="small" @click="copyText(formattedDate)"
+                                                :disabled="!formattedDate">
+                                                <el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制
+                                            </el-button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        </el-tab-pane>
 
-                    <div class="time-result-area">
-                        <div class="time-result-label">转换结果</div>
-                        <div class="time-result-value" :class="{ placeholder: !formattedDate }">
-                            {{ formattedDate || '输入时间戳后自动转换' }}
-                        </div>
-                        <div class="time-result-actions">
-                            <el-button size="small" @click="copyText(formattedDate)" :disabled="!formattedDate">
-                                <el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制
-                            </el-button>
-                        </div>
-                    </div>
+                        <!-- Tab 2: 日期差值计算 -->
+                        <el-tab-pane label="日期差值计算" name="datediff">
+                            <div class="time-diff-card">
+                                <p class="time-card-title">
+                                    <span class="title-icon">📆</span> 日期差值计算
+                                </p>
+
+                                <div class="time-form-row">
+                                    <span class="label-text">快捷</span>
+                                    <div class="diff-quick-actions">
+                                        <el-button size="small" @click="setToday">今天</el-button>
+                                        <el-button size="small" @click="setYesterday">昨天</el-button>
+                                        <el-button size="small" @click="setThisWeek">本周</el-button>
+                                        <el-button size="small" @click="setThisMonth">本月</el-button>
+                                        <el-button size="small" @click="setLast7Days">最近7天</el-button>
+                                        <el-button size="small" @click="setLast30Days">最近30天</el-button>
+                                        <el-button size="small" @click="setLast90Days">最近90天</el-button>
+                                    </div>
+                                </div>
+
+                                <div class="diff-date-row">
+                                    <span class="label-text">开始</span>
+                                    <el-date-picker v-model="diffStart" type="date" placeholder="开始日期"
+                                        format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+                                        style="width:200px;"></el-date-picker>
+                                    <span class="diff-swap-btn" @click="swapDates" title="交换日期">⇄</span>
+                                    <span class="label-text">结束</span>
+                                    <el-date-picker v-model="diffEnd" type="date" placeholder="结束日期" format="YYYY-MM-DD"
+                                        value-format="YYYY-MM-DD" style="width:200px;"></el-date-picker>
+                                </div>
+
+                                <div class="diff-options">
+                                    <div style="display:flex;align-items:center;gap:8px;">
+                                        <span class="label-text">单位</span>
+                                        <el-radio-group v-model="diffUnit" size="small">
+                                            <el-radio-button value="auto">自动</el-radio-button>
+                                            <el-radio-button value="days">天</el-radio-button>
+                                            <el-radio-button value="hours">小时</el-radio-button>
+                                            <el-radio-button value="minutes">分钟</el-radio-button>
+                                            <el-radio-button value="seconds">秒</el-radio-button>
+                                        </el-radio-group>
+                                    </div>
+                                    <el-checkbox v-model="diffInclusive" size="small">包含结束日期</el-checkbox>
+                                </div>
+
+                                <div class="time-result-area">
+                                    <div class="time-result-label">计算结果</div>
+                                    <div class="time-result-value" :class="{ placeholder: !dateDiffText }">
+                                        {{ dateDiffText || '请选择开始日期和结束日期' }}
+                                    </div>
+                                    <div class="diff-result-detail" v-if="dateDiffText">
+                                        {{ dateDiffDetail }}
+                                    </div>
+                                    <div class="time-result-actions" style="margin-top:8px;">
+                                        <el-button size="small" @click="copyDiffResult" :disabled="!dateDiffText">
+                                            <el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </div>
                 </div>
-            </div>
-
-            <div class="time-footer">
-                <span>当前时区: {{ timezoneText }}</span>
-                <span>{{ statusText }}</span>
+                </el-tab-pane>
+                </el-tabs>
             </div>
         </div>
 
-        <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="640px" center>
-            <div class="donate-content">
-                <div class="donate-img-col">
-                    <img src="/assets/images/donate-wechat.png" alt="微信打赏">
-                    <p>微信</p>
-                </div>
-                <div class="donate-img-col">
-                    <img src="/assets/images/donate-alipay.png" alt="支付宝打赏">
-                    <p>支付宝</p>
-                </div>
+        <div class="time-footer">
+            <span>当前时区: {{ timezoneText }}</span>
+            <span>{{ statusText }}</span>
+        </div>
+    </div>
+
+    <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="640px" center>
+        <div class="donate-content">
+            <div class="donate-img-col">
+                <img src="/assets/images/donate-wechat.png" alt="微信打赏">
+                <p>微信</p>
             </div>
-        </el-dialog>
+            <div class="donate-img-col">
+                <img src="/assets/images/donate-alipay.png" alt="支付宝打赏">
+                <p>支付宝</p>
+            </div>
+        </div>
+    </el-dialog>
 
     </div>
 
@@ -437,6 +618,9 @@
 
         const app = createApp({
             setup() {
+                // === Tab ===
+                const activeTab = ref('timestamp');
+
                 // === 日期 → 时间戳 ===
                 const dateType = ref('date');
                 const selectedDate = ref(null);
@@ -446,6 +630,20 @@
                 const tsInput = ref('');
                 const tsInputUnit = ref('seconds');
                 const dateFormat = ref('yyyy-MM-dd HH:mm:ss');
+
+                // === 日期差值计算 ===
+                function toDateStr(d) {
+                    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                }
+                function parseDateStr(str) {
+                    var parts = str.split('-');
+                    return new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])));
+                }
+                const now = new Date();
+                const diffStart = ref(toDateStr(now));
+                const diffEnd = ref(toDateStr(now));
+                const diffUnit = ref('auto');
+                const diffInclusive = ref(false);
 
                 const statusText = ref('');
                 const donateVisible = ref(false);
@@ -476,7 +674,6 @@
                 function parseTsInput() {
                     const raw = tsInput.value.trim();
                     if (!raw) return NaN;
-                    // 支持纯数字，也支持带空格
                     const num = Number(raw.replace(/[,_\s]/g, ''));
                     if (isNaN(num)) return NaN;
                     if (tsInputUnit.value === 'seconds') {
@@ -526,6 +723,148 @@
                     return formatDate(new Date(ts), fmt);
                 });
 
+                // === 日期差值计算逻辑 ===
+                const dateDiffResult = computed(function () {
+                    if (!diffStart.value || !diffEnd.value) return null;
+
+                    // 用 UTC 午夜计算，避免夏令时导致跨天误差
+                    const start = parseDateStr(diffStart.value);
+                    const end = parseDateStr(diffEnd.value);
+
+                    let diffMs = end.getTime() - start.getTime();
+                    if (diffInclusive.value) {
+                        diffMs += diffMs >= 0 ? 86400000 : -86400000;
+                    }
+
+                    const sign = diffMs >= 0 ? 1 : -1;
+                    const absMs = Math.abs(diffMs);
+
+                    const absSeconds = Math.floor(absMs / 1000);
+                    const absMinutes = Math.floor(absSeconds / 60);
+                    const absHours = Math.floor(absMinutes / 60);
+                    const absDays = Math.floor(absHours / 24);
+
+                    return {
+                        sign: sign,
+                        days: absDays,
+                        hours: absHours % 24,
+                        minutes: absMinutes % 60,
+                        seconds: absSeconds % 60,
+                        totalDays: absDays * sign,
+                        totalHours: absHours * sign,
+                        totalMinutes: absMinutes * sign,
+                        totalSeconds: absSeconds * sign
+                    };
+                });
+
+                const dateDiffText = computed(function () {
+                    const r = dateDiffResult.value;
+                    if (!r) return '';
+                    const prefix = r.sign < 0 ? '−' : '';
+                    const unit = diffUnit.value;
+
+                    switch (unit) {
+                        case 'days':
+                            return prefix + r.totalDays + ' 天';
+                        case 'hours':
+                            return prefix + r.totalHours + ' 小时';
+                        case 'minutes':
+                            return prefix + r.totalMinutes + ' 分钟';
+                        case 'seconds':
+                            return prefix + r.totalSeconds + ' 秒';
+                        case 'auto':
+                        default:
+                            if (r.days >= 1) {
+                                return (r.sign < 0 ? '−' : '') + r.days + ' 天';
+                            } else if (r.totalHours !== 0 && Math.abs(r.totalHours) >= 1) {
+                                return prefix + r.totalHours + ' 小时';
+                            } else if (r.totalMinutes !== 0 && Math.abs(r.totalMinutes) >= 1) {
+                                return prefix + r.totalMinutes + ' 分钟';
+                            } else {
+                                return prefix + r.totalSeconds + ' 秒';
+                            }
+                    }
+                });
+
+                const dateDiffDetail = computed(function () {
+                    const r = dateDiffResult.value;
+                    if (!r) return '';
+
+                    const parts = [];
+                    if (r.days > 0) parts.push(r.days + '天');
+                    if (r.hours > 0) parts.push(r.hours + '小时');
+                    if (r.minutes > 0) parts.push(r.minutes + '分钟');
+                    if (r.seconds > 0) parts.push(r.seconds + '秒');
+                    if (parts.length === 0) parts.push('0天');
+
+                    let detail = parts.join(' ');
+                    if (r.sign < 0) {
+                        detail += ' （开始日期晚于结束日期）';
+                    }
+                    return detail;
+                });
+
+                function swapDates() {
+                    const tmp = diffStart.value;
+                    diffStart.value = diffEnd.value;
+                    diffEnd.value = tmp;
+                }
+
+                function setToday() {
+                    const s = toDateStr(new Date());
+                    diffStart.value = s;
+                    diffEnd.value = s;
+                }
+
+                function setYesterday() {
+                    const d = new Date();
+                    d.setDate(d.getDate() - 1);
+                    const s = toDateStr(d);
+                    diffStart.value = s;
+                    diffEnd.value = s;
+                }
+
+                function setThisWeek() {
+                    const nowDate = new Date();
+                    const dayOfWeek = nowDate.getDay();
+                    const monday = new Date(nowDate);
+                    monday.setDate(nowDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+                    diffStart.value = toDateStr(monday);
+                    diffEnd.value = toDateStr(nowDate);
+                }
+
+                function setThisMonth() {
+                    const nowDate = new Date();
+                    const firstDay = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
+                    diffStart.value = toDateStr(firstDay);
+                    diffEnd.value = toDateStr(nowDate);
+                }
+
+                function setLast7Days() {
+                    const endDate = new Date();
+                    const startDate = new Date(endDate);
+                    startDate.setDate(endDate.getDate() - 6);
+                    diffStart.value = toDateStr(startDate);
+                    diffEnd.value = toDateStr(endDate);
+                }
+
+                function setLast30Days() {
+                    const endDate = new Date();
+                    const startDate = new Date(endDate);
+                    startDate.setDate(endDate.getDate() - 29);
+                    diffStart.value = toDateStr(startDate);
+                    diffEnd.value = toDateStr(endDate);
+                }
+
+                function setLast90Days() {
+                    const endDate = new Date();
+                    const startDate = new Date(endDate);
+                    startDate.setDate(endDate.getDate() - 89);
+                    diffStart.value = toDateStr(startDate);
+                    diffEnd.value = toDateStr(endDate);
+                }
+
+                // === 通用 ===
                 function setNow() {
                     selectedDate.value = new Date();
                 }
@@ -558,28 +897,58 @@
                     });
                 }
 
+                function copyDiffResult() {
+                    const text = dateDiffText.value;
+                    const detail = dateDiffDetail.value;
+                    if (!text) return;
+                    const content = text + '\n' + detail;
+                    navigator.clipboard.writeText(content).then(function () {
+                        statusText.value = '已复制到剪贴板';
+                        ElementPlus.ElMessage.success('已复制到剪贴板');
+                        setTimeout(function () { statusText.value = ''; }, 2000);
+                    }).catch(function () {
+                        ElementPlus.ElMessage.error('复制失败，请手动复制');
+                    });
+                }
+
                 function goHome() {
                     window.location.href = '/index.html';
                 }
 
                 return {
+                    activeTab,
                     dateType,
                     selectedDate,
                     tsUnit,
                     tsInput,
                     tsInputUnit,
                     dateFormat,
+                    diffStart,
+                    diffEnd,
+                    diffUnit,
+                    diffInclusive,
                     statusText,
                     donateVisible,
                     tsInputUnitLabel,
                     timezoneText,
                     dateTimestamp,
                     formattedDate,
+                    dateDiffText,
+                    dateDiffDetail,
                     setNow,
+                    swapDates,
+                    setToday,
+                    setYesterday,
+                    setThisWeek,
+                    setThisMonth,
+                    setLast7Days,
+                    setLast30Days,
+                    setLast90Days,
                     filterTsInput,
                     setFormat,
                     formatType,
                     copyText,
+                    copyDiffResult,
                     goHome
                 };
             }
