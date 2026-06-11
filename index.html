@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LBN 万能网站</title>
     <meta name="description" content="LBN 万能网站 - 提供各种实用工具和资源的在线平台，帮助用户轻松访问和使用各种工具，提升工作效率和生活便利。">
+    <meta name="keywords" content="LBN,万能网站,实用工具,在线平台,工作效率,生活便利">
     <style>
         :root {
             --bg: #f5f5f5;
@@ -364,6 +365,9 @@
                         var fullUrl = locEl ? locEl.textContent.trim() : '';
                         // 从完整 URL 提取相对路径
                         var relUrl = fullUrl.replace(/^https?:\/\/[^\/]+/, '');
+
+                        // 排除首页自身
+                        if (relUrl === '/' || relUrl === '/index.html') return;
 
                         pages.push({
                             name: nameEls.length ? nameEls[0].textContent.trim() : '',
