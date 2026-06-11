@@ -50,7 +50,7 @@ jobs: # 定义工作流中的作业列表
             [ -z "$TITLE" ] && TITLE="$f"                       # 如果提取为空，用文件名兜底
 
             # 提取 <meta name="description" content="..."> 中的描述
-            DESCRIPTION=$(perl -ne 'if (/<meta[^>]*\bname=["\']description["\'][^>]*\bcontent=["\']([^"\']*)["\']/i) { print $1; exit } if (/<meta[^>]*\bcontent=["\']([^"\']*)["\'][^>]*\bname=["\']description["\']/i) { print $1; exit }' "$f" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+            DESCRIPTION=$(perl -ne 'if (/<meta[^>]*\bname=["\x27]description["\x27][^>]*\bcontent=["\x27]([^"\x27]*)["\x27]/i) { print $1; exit } if (/<meta[^>]*\bcontent=["\x27]([^"\x27]*)["\x27][^>]*\bname=["\x27]description["\x27]/i) { print $1; exit }' "$f" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
             echo "  Extracted description: [$DESCRIPTION]"
 
             # 转义 JSON 特殊字符：反斜杠 → 双反斜杠，双引号 → 反斜杠+双引号
