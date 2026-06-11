@@ -333,17 +333,17 @@
             </div>
         </div>
 
-        <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="420px" center>
-            <div style="display:flex;justify-content:center;gap:24px;padding:16px 0;">
-                <div style="text-align:center;">
+        <el-dialog v-model="donateVisible" title="创作不已，打赏一二" width="640px" top="25vh" center>
+            <div style="display:flex;justify-content:center;align-items:center;gap:48px;padding:16px;height:calc(50vh - 72px);box-sizing:border-box;">
+                <div style="text-align:center;display:flex;flex-direction:column;align-items:center;max-height:100%;">
                     <img src="/assets/images/donate-wechat.png"
-                        style="width:150px;height:150px;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
-                    <p style="font-size:13px;color:#909399;margin-top:8px;">微信</p>
+                        style="max-width:320px;max-height:calc(100% - 28px);width:auto;height:auto;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
+                    <p style="font-size:15px;color:#909399;margin-top:8px;flex-shrink:0;">微信</p>
                 </div>
-                <div style="text-align:center;">
+                <div style="text-align:center;display:flex;flex-direction:column;align-items:center;max-height:100%;">
                     <img src="/assets/images/donate-alipay.png"
-                        style="width:150px;height:150px;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
-                    <p style="font-size:13px;color:#909399;margin-top:8px;">支付宝</p>
+                        style="max-width:320px;max-height:calc(100% - 28px);width:auto;height:auto;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
+                    <p style="font-size:15px;color:#909399;margin-top:8px;flex-shrink:0;">支付宝</p>
                 </div>
             </div>
         </el-dialog>
