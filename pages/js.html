@@ -245,6 +245,54 @@
             font-size: 11px;
             color: #c0c4cc;
         }
+
+        /* 打赏弹框 - 居中，高度70vh最小700px */
+        .el-overlay-dialog {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+        .el-dialog {
+            margin-top: 0 !important;
+        }
+        .donate-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            padding: 16px;
+            height: calc(70vh - 112px);
+            min-height: 588px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .donate-img-col {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow: hidden;
+        }
+        .donate-img-col img {
+            max-width: 290px;
+            max-height: calc(100% - 36px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            padding: 8px;
+            background: #fff;
+        }
+        .donate-img-col p {
+            font-size: 15px;
+            color: #909399;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 
@@ -333,17 +381,15 @@
             </div>
         </div>
 
-        <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="640px" top="25vh" center>
-            <div style="display:flex;justify-content:center;align-items:center;gap:48px;padding:16px;height:calc(50vh - 72px);box-sizing:border-box;">
-                <div style="text-align:center;display:flex;flex-direction:column;align-items:center;max-height:100%;">
-                    <img src="/assets/images/donate-wechat.png"
-                        style="max-width:320px;max-height:calc(100% - 28px);width:auto;height:auto;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
-                    <p style="font-size:15px;color:#909399;margin-top:8px;flex-shrink:0;">微信</p>
+        <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="640px" center>
+            <div class="donate-content">
+                <div class="donate-img-col">
+                    <img src="/assets/images/donate-wechat.png" alt="微信打赏">
+                    <p>微信</p>
                 </div>
-                <div style="text-align:center;display:flex;flex-direction:column;align-items:center;max-height:100%;">
-                    <img src="/assets/images/donate-alipay.png"
-                        style="max-width:320px;max-height:calc(100% - 28px);width:auto;height:auto;border-radius:8px;border:1px solid #e8e8e8;padding:8px;background:#fff;object-fit:contain;">
-                    <p style="font-size:15px;color:#909399;margin-top:8px;flex-shrink:0;">支付宝</p>
+                <div class="donate-img-col">
+                    <img src="/assets/images/donate-alipay.png" alt="支付宝打赏">
+                    <p>支付宝</p>
                 </div>
             </div>
         </el-dialog>
