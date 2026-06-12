@@ -8,6 +8,7 @@
     <meta name="description" content="LBN万能网站在线JSON格式化工具，支持JSON字符串的格式化、压缩、转义和去转义操作，方便开发者调试和查看JSON数据。">
     <meta name="keywords" content="LBN,万能网站,JSON格式化,JSON压缩,JSON工具,在线JSON美化,代码压缩,开发者工具">
     <link rel="stylesheet" href="/assets/libs/element-plus/element-plus.index.css">
+    <link rel="stylesheet" href="/assets/libs/prism/prism.min.css">
     <style>
         body {
             margin: 0;
@@ -299,6 +300,28 @@
             margin-top: 8px;
             flex-shrink: 0;
         }
+
+        .token.keyword {
+            color: #d73a49;
+            font-weight: 600;
+        }
+
+        .token.string {
+            color: #22863a;
+        }
+
+        .token.number {
+            color: #005cc5;
+        }
+
+        .token.comment {
+            color: #6a737d;
+            font-style: italic;
+        }
+
+        .token.function {
+            color: #6f42c1;
+        }
     </style>
 </head>
 
@@ -346,8 +369,8 @@
                     </div>
                     <div class="json-panel-body">
                         <div class="code-viewer">
-                            <pre class="code-lines">{{ inputLineNumbers }}</pre>
-                            <textarea v-model="jsonText" class="code-textarea" placeholder="在此粘贴或输入 JSON 字符串..."
+                            <pre class="code-lines" ref="inputLines">{{ inputLineNumbers }}</pre>
+                            <textarea ref="inputArea" v-model="jsonText" class="code-textarea" placeholder="在此粘贴或输入 JSON 字符串..."
                                 @keydown="onKeydown" spellcheck="false"></textarea>
                         </div>
                     </div>
@@ -366,7 +389,7 @@
                     <div class="json-panel-body">
                         <div class="code-viewer" v-if="resultText">
                             <pre class="code-lines">{{ resultLineNumbers }}</pre>
-                            <pre class="code-content">{{ resultText }}</pre>
+                            <pre class="code-content"><code class="language-json" v-html="highlightedResult"></code></pre>
                         </div>
                         <div class="code-viewer code-viewer-empty" v-else>
                             <pre class="code-content-empty">操作结果将显示在这里...</pre>
@@ -408,9 +431,10 @@
     <script src="/assets/libs/vue/vue.global.prod.js"></script>
     <script src="/assets/libs/element-plus/element-plus.index.full.min.js"></script>
     <script src="/assets/libs/element-plus/element-plus.icons.iife.min.js"></script>
+    <script src="/assets/libs/prism/prism.min.js"></script>
 
     <script type="text/javascript">
-        const { createApp, ref, computed } = Vue;
+        const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
 
         const app = createApp({
             setup() {
@@ -421,6 +445,8 @@
                 const resultStatus = ref('');
                 const autoFormat = ref(true);
                 const donateVisible = ref(false);
+                const inputArea = ref(null);
+                const inputLines = ref(null);
 
                 const inputCharCount = computed(function () { return jsonText.value.length; });
                 const inputLineCount = computed(function () {
@@ -568,6 +594,36 @@
                     window.location.href = '/';
                 }
 
+                function adjustSize() {
+                    nextTick(function () {
+                        var ta = inputArea.value;
+                        var lines = inputLines.value;
+                        if (!ta) return;
+                        ta.style.minHeight = '';
+                        ta.style.minWidth = '';
+                        if (lines) lines.style.minHeight = '';
+
+                        var parent = ta.parentElement;
+                        var sty = getComputedStyle(ta);
+                        var padV = parseFloat(sty.paddingTop) + parseFloat(sty.paddingBottom);
+                        var padH = parseFloat(sty.paddingLeft) + parseFloat(sty.paddingRight);
+
+                        var contentH = ta.scrollHeight - padV;
+                        var contentW = ta.scrollWidth - padH;
+
+                        var availH = parent.clientHeight - padV;
+                        var availW = parent.clientWidth - padH;
+
+                        if (contentH > availH) {
+                            ta.style.minHeight = contentH + 'px';
+                            if (lines) lines.style.minHeight = contentH + 'px';
+                        }
+                        if (contentW > availW) {
+                            ta.style.minWidth = contentW + 'px';
+                        }
+                    });
+                }
+
                 function onKeydown(e) {
                     if ((e.ctrlKey && e.shiftKey && e.key === 'F') || (e.ctrlKey && e.altKey && e.key === 'l')) {
                         e.preventDefault();
@@ -579,6 +635,21 @@
                     }
                 }
 
+                watch(jsonText, adjustSize);
+
+                onMounted(function () {
+                    adjustSize();
+                });
+
+                const highlightedResult = computed(() => {
+                    if (!resultText.value) return '';
+                    return Prism.highlight(
+                        resultText.value,
+                        Prism.languages.javascript,
+                        'json'
+                    );
+                });
+
                 return {
                     jsonText,
                     resultText,
@@ -587,6 +658,8 @@
                     resultStatus,
                     autoFormat,
                     donateVisible,
+                    inputArea,
+                    inputLines,
                     inputCharCount,
                     inputLineCount,
                     inputSizeText,
@@ -602,7 +675,8 @@
                     copyResult,
                     clearAll,
                     goHome,
-                    onKeydown
+                    onKeydown,
+                    highlightedResult
                 };
             }
         });
