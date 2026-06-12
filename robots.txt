@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # 明确告诉 Google 站点地图的位置
-Sitemap: https://luuunnn.github.io/sitemap.xml
+Sitemap: https://lbprime.github.io/sitemap.xml

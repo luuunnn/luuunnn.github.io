@@ -40,8 +40,8 @@ jobs: # 定义工作流中的作业列表
           from datetime import datetime, timezone
           from xml.sax.saxutils import escape as xml_escape
 
-          BASE_URL = "https://luuunnn.github.io"
-          NS_PAGE = "https://luuunnn.github.io/sitemap-ext"
+          BASE_URL = "https://lbprime.github.io"
+          NS_PAGE = "https://lbprime.github.io/sitemap-ext"
 
           def extract_meta(content, name):
               """提取 <meta name="X" content="..."> 的 content 值，兼容属性顺序"""
