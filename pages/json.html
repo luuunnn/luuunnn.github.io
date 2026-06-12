@@ -322,6 +322,120 @@
         .token.function {
             color: #6f42c1;
         }
+
+        /* 视图标签切换 */
+        .json-view-tabs {
+            display: flex;
+            gap: 2px;
+            margin-left: 12px;
+        }
+
+        .json-view-tab {
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #909399;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .json-view-tab:hover {
+            color: #409eff;
+        }
+
+        .json-view-tab.active {
+            color: #409eff;
+            background: #ecf5ff;
+            border-color: #d9ecff;
+        }
+
+        .json-view-tab.disabled {
+            color: #c0c4cc;
+            cursor: not-allowed;
+        }
+
+        .json-view-tab.disabled:hover {
+            color: #c0c4cc;
+        }
+
+        /* 树形图 */
+        .json-tree-view {
+            padding: 8px 0;
+            overflow: auto;
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .jt-node {
+            user-select: none;
+        }
+
+        .jt-row {
+            display: flex;
+            align-items: baseline;
+            cursor: pointer;
+            padding-right: 12px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .jt-row:hover {
+            background: #f0f2f5;
+        }
+
+        .jt-arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            min-width: 16px;
+            font-size: 10px;
+            color: #909399;
+            transition: transform 0.15s;
+        }
+
+        .jt-arrow-empty {
+            visibility: hidden;
+        }
+
+        .jt-key {
+            color: #881391;
+        }
+
+        .jt-sep {
+            color: #909399;
+            margin: 0 2px;
+        }
+
+        .jt-val {
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .jt-sum {
+            color: #909399;
+            font-style: italic;
+        }
+
+        .jt-string .jt-val {
+            color: #22863a;
+        }
+
+        .jt-number .jt-val {
+            color: #005cc5;
+        }
+
+        .jt-boolean .jt-val {
+            color: #005cc5;
+        }
+
+        .jt-null .jt-val {
+            color: #005cc5;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -378,6 +492,10 @@
                 <div class="json-panel json-panel-output">
                     <div class="json-panel-header">
                         <span>结果</span>
+                        <div class="json-view-tabs">
+                            <span class="json-view-tab" :class="{ active: activeView === 'code' }" @click="activeView = 'code'">代码</span>
+                            <span class="json-view-tab" :class="{ active: activeView === 'tree', disabled: !parsedJson }" @click="parsedJson && (activeView = 'tree')">树形图</span>
+                        </div>
                         <span style="font-weight:400;color:#c0c4cc;font-size:12px;">{{ resultStatus }}</span>
                         <el-button size="small" @click="copyResult"
                             :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
@@ -387,9 +505,12 @@
                         </span>
                     </div>
                     <div class="json-panel-body">
-                        <div class="code-viewer" v-if="resultText">
+                        <div class="code-viewer" v-if="resultText && activeView === 'code'">
                             <pre class="code-lines">{{ resultLineNumbers }}</pre>
                             <pre class="code-content"><code class="language-json" v-html="highlightedResult"></code></pre>
+                        </div>
+                        <div class="code-viewer json-tree-view" v-else-if="parsedJson && activeView === 'tree'">
+                            <json-tree-node :node="jsonTreeData" :depth="0"></json-tree-node>
                         </div>
                         <div class="code-viewer code-viewer-empty" v-else>
                             <pre class="code-content-empty">操作结果将显示在这里...</pre>
@@ -445,6 +566,8 @@
                 const resultStatus = ref('');
                 const autoFormat = ref(true);
                 const donateVisible = ref(false);
+                const parsedJson = ref(null);
+                const activeView = ref('code');
                 const inputArea = ref(null);
                 const inputLines = ref(null);
 
@@ -514,6 +637,7 @@
                     if (!jsonText.value) return;
                     try {
                         const obj = JSON.parse(jsonText.value);
+                        parsedJson.value = obj;
                         setResult(JSON.stringify(obj, null, 2), '格式化完成');
                         setStatus('格式化完成');
                     } catch (e) {
@@ -525,6 +649,7 @@
                     if (!jsonText.value) return;
                     try {
                         const obj = JSON.parse(jsonText.value);
+                        parsedJson.value = obj;
                         setResult(JSON.stringify(obj), '压缩完成');
                         setStatus('压缩完成');
                     } catch (e) {
@@ -536,6 +661,7 @@
                     if (!jsonText.value) return;
                     try {
                         const obj = JSON.parse(jsonText.value);
+                        parsedJson.value = obj;
                         let escaped = JSON.stringify(JSON.stringify(obj));
                         if (autoFormat.value) {
                             try { escaped = JSON.stringify(JSON.parse(escaped), null, 2); } catch (_) { }
@@ -560,10 +686,17 @@
                         if (typeof parsed === 'string') {
                             let result = parsed;
                             if (autoFormat.value) {
-                                try { result = JSON.stringify(JSON.parse(parsed), null, 2); } catch (_) { }
+                                try {
+                                    const obj = JSON.parse(parsed);
+                                    parsedJson.value = obj;
+                                    result = JSON.stringify(obj, null, 2);
+                                } catch (_) {
+                                    parsedJson.value = null;
+                                }
                             }
                             setResult(result, '去转义完成');
                         } else {
+                            parsedJson.value = parsed;
                             setResult(JSON.stringify(parsed, null, 2), '去转义完成（已是 JSON 对象）');
                         }
                         setStatus('去转义完成');
@@ -587,12 +720,68 @@
                     resultText.value = '';
                     errorMsg.value = '';
                     resultStatus.value = '';
+                    parsedJson.value = null;
+                    activeView.value = 'code';
                     setStatus('已清空');
                 }
 
                 function goHome() {
                     window.location.href = '/';
                 }
+
+                function getJsonType(val) {
+                    if (val === null) return 'null';
+                    if (Array.isArray(val)) return 'array';
+                    return typeof val;
+                }
+
+                function buildTreeNodes(key, value) {
+                    const type = getJsonType(value);
+                    const node = {
+                        key: key,
+                        type: type,
+                        hasChildren: false,
+                        children: [],
+                        displayValue: '',
+                        summary: ''
+                    };
+
+                    if (value === null) {
+                        node.displayValue = 'null';
+                        return node;
+                    }
+
+                    if (Array.isArray(value)) {
+                        node.hasChildren = true;
+                        node.summary = 'Array[' + value.length + ']';
+                        for (var i = 0; i < value.length; i++) {
+                            node.children.push(buildTreeNodes('[' + i + ']', value[i]));
+                        }
+                        return node;
+                    }
+
+                    if (type === 'object') {
+                        var keys = Object.keys(value);
+                        node.hasChildren = keys.length > 0;
+                        node.summary = 'Object{' + keys.length + '}';
+                        for (var ki = 0; ki < keys.length; ki++) {
+                            node.children.push(buildTreeNodes(keys[ki], value[keys[ki]]));
+                        }
+                        return node;
+                    }
+
+                    if (type === 'string') {
+                        node.displayValue = JSON.stringify(value);
+                    } else {
+                        node.displayValue = String(value);
+                    }
+                    return node;
+                }
+
+                const jsonTreeData = computed(function () {
+                    if (parsedJson.value === null || parsedJson.value === undefined) return null;
+                    return buildTreeNodes('root', parsedJson.value);
+                });
 
                 function adjustSize() {
                     nextTick(function () {
@@ -645,7 +834,7 @@
                     if (!resultText.value) return '';
                     return Prism.highlight(
                         resultText.value,
-                        Prism.languages.javascript,
+                        Prism.languages.json || Prism.languages.javascript,
                         'json'
                     );
                 });
@@ -658,6 +847,9 @@
                     resultStatus,
                     autoFormat,
                     donateVisible,
+                    parsedJson,
+                    activeView,
+                    jsonTreeData,
                     inputArea,
                     inputLines,
                     inputCharCount,
@@ -681,6 +873,40 @@
             }
         });
 
+        // 树形图递归组件
+        const JsonTreeNode = {
+            name: 'JsonTreeNode',
+            props: {
+                node: { type: Object, required: true },
+                depth: { type: Number, default: 0 }
+            },
+            data: function () {
+                return {
+                    expanded: this.node.hasChildren && this.depth < 2
+                };
+            },
+            methods: {
+                toggle: function () {
+                    if (this.node.hasChildren) {
+                        this.expanded = !this.expanded;
+                    }
+                }
+            },
+            template: '<div class="jt-node" :class="\'jt-\' + node.type">'
+                + '<div class="jt-row" @click="toggle" :style="{paddingLeft: (depth * 16 + 8) + \'px\'}">'
+                + '<span class="jt-arrow" v-if="node.hasChildren">{{ expanded ? \'▼\' : \'▶\' }}</span>'
+                + '<span class="jt-arrow jt-arrow-empty" v-else>▶</span>'
+                + '<span class="jt-key">{{ node.key }}</span>'
+                + '<span class="jt-sep" v-if="node.displayValue || node.summary">: </span>'
+                + '<span class="jt-val" v-if="node.displayValue">{{ node.displayValue }}</span>'
+                + '<span class="jt-sum" v-if="node.summary">{{ node.summary }}</span>'
+                + '</div>'
+                + '<div v-if="node.hasChildren" v-show="expanded">'
+                + '<json-tree-node v-for="(child, idx) in node.children" :key="idx" :node="child" :depth="depth + 1"></json-tree-node>'
+                + '</div>'
+                + '</div>'
+        };
+
         // Register Element Plus icons
         app.component('edit-icon', ElementPlusIconsVue.Edit);
         app.component('switch-icon', ElementPlusIconsVue.Switch);
@@ -689,6 +915,7 @@
         app.component('document-copy-icon', ElementPlusIconsVue.DocumentCopy);
         app.component('delete-icon', ElementPlusIconsVue.Delete);
         app.component('home-filled-icon', ElementPlusIconsVue.HomeFilled);
+        app.component('json-tree-node', JsonTreeNode);
 
         app.use(ElementPlus);
         app.mount('#app');
