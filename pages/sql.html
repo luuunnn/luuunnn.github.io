@@ -8,6 +8,7 @@
     <meta name="description" content="LBN万能网站在线SQL格式化、压缩工具，支持多种数据库方言，快速美化或压缩SQL代码，方便开发者调试和优化SQL语句。">
     <meta name="keywords" content="LBN,万能网站,SQL格式化,SQL压缩,SQL美化,在线SQL工具,数据库工具,开发者工具">
     <link rel="stylesheet" href="/assets/libs/element-plus/element-plus.index.css">
+    <link rel="stylesheet" href="/assets/libs/prism/prism.min.css">
     <style>
         body {
             margin: 0;
@@ -307,6 +308,27 @@
             flex-shrink: 0;
         }
 
+        .token.keyword {
+            color: #d73a49;
+            font-weight: 600;
+        }
+
+        .token.string {
+            color: #22863a;
+        }
+
+        .token.number {
+            color: #005cc5;
+        }
+
+        .token.comment {
+            color: #6a737d;
+            font-style: italic;
+        }
+
+        .token.function {
+            color: #6f42c1;
+        }
     </style>
 </head>
 
@@ -350,10 +372,12 @@
                         <div class="sql-panel-options">
                             <span style="font-size:12px;color:#909399;">方言</span>
                             <el-select v-model="dialect" size="small" style="width:120px;" @change="onDialectChange">
-                                <el-option v-for="d in dialectOptions" :key="d.value" :label="d.label" :value="d.value"></el-option>
+                                <el-option v-for="d in dialectOptions" :key="d.value" :label="d.label"
+                                    :value="d.value"></el-option>
                             </el-select>
                             <span style="font-size:12px;color:#909399;">关键字</span>
-                            <el-select v-model="keywordCase" size="small" style="width:80px;" @change="onKeywordCaseChange">
+                            <el-select v-model="keywordCase" size="small" style="width:80px;"
+                                @change="onKeywordCaseChange">
                                 <el-option label="大写" value="upper"></el-option>
                                 <el-option label="小写" value="lower"></el-option>
                                 <el-option label="保留" value="preserve"></el-option>
@@ -364,8 +388,7 @@
                         <div class="code-viewer">
                             <pre class="code-lines" ref="inputLines">{{ inputLineNumbers }}</pre>
                             <textarea ref="inputArea" v-model="sqlText" class="code-textarea"
-                                placeholder="在此粘贴或输入 SQL 代码..." @keydown="onKeydown"
-                                spellcheck="false"></textarea>
+                                placeholder="在此粘贴或输入 SQL 代码..." @keydown="onKeydown" spellcheck="false"></textarea>
                         </div>
                     </div>
                 </div>
@@ -385,7 +408,7 @@
                     <div class="sql-panel-body">
                         <div class="code-viewer" v-if="resultText">
                             <pre class="code-lines">{{ resultLineNumbers }}</pre>
-                            <pre class="code-content">{{ resultText }}</pre>
+                            <pre class="code-content"><code class="language-sql" v-html="highlightedResult"></code></pre>
                         </div>
                         <div class="code-viewer code-viewer-empty" v-else>
                             <pre class="code-content-empty">操作结果将显示在这里...</pre>
@@ -428,6 +451,8 @@
     <script src="/assets/libs/element-plus/element-plus.index.full.min.js"></script>
     <script src="/assets/libs/element-plus/element-plus.icons.iife.min.js"></script>
     <script src="/assets/libs/sql-formatter/sql-formatter.min.js"></script>
+    <script src="/assets/libs/prism/prism.min.js"></script>
+    <script src="/assets/libs/prism/prism-sql.min.js"></script>
 
     <script type="text/javascript">
         const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
@@ -669,6 +694,15 @@
                     adjustSize();
                 });
 
+                const highlightedResult = computed(() => {
+                    if (!resultText.value) return '';
+                    return Prism.highlight(
+                        resultText.value,
+                        Prism.languages.sql,
+                        'sql'
+                    );
+                });
+
                 return {
                     sqlText,
                     resultText,
@@ -697,7 +731,8 @@
                     goHome,
                     onDialectChange,
                     onKeywordCaseChange,
-                    onKeydown
+                    onKeydown,
+                    highlightedResult
                 };
             }
         });
