@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LBN-SQL格式化</title>
+    <meta name="description" content="LBN万能网站在线SQL格式化、压缩工具，支持多种数据库方言，快速美化或压缩SQL代码，方便开发者调试和优化SQL语句。">
+    <meta name="keywords" content="LBN,万能网站,SQL格式化,SQL压缩,SQL美化,在线SQL工具,数据库工具,开发者工具">
+    <link rel="stylesheet" href="/assets/libs/element-plus/element-plus.index.css">
+    <style>
+        body {
+            margin: 0;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .sql-tool {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 16px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .sql-header {
+            margin-bottom: 12px;
+            padding-left: 20px;
+        }
+
+        .sql-header .title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .sql-header h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #303133;
+        }
+
+        .sql-header p {
+            margin: 0;
+            color: #909399;
+            font-size: 13px;
+        }
+
+        .sql-panel-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .sql-panel-options {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .sql-panels {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .sql-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .sql-panel-header {
+            font-size: 13px;
+            color: #606266;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sql-panel-body {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sql-panel-body .el-textarea {
+            height: 100%;
+        }
+
+        .sql-panel-body .el-textarea__inner {
+            height: 100% !important;
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .code-viewer {
+            height: 100%;
+            overflow: auto;
+            display: flex;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .code-viewer-empty {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .code-lines {
+            margin: 0;
+            padding: 8px 12px 8px 12px;
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c0c4cc;
+            text-align: right;
+            user-select: none;
+            -webkit-user-select: none;
+            background: #f5f5f5;
+            border-right: 1px solid #ebeef5;
+            min-width: 40px;
+            white-space: pre;
+        }
+
+        .code-textarea {
+            margin: 0;
+            padding: 8px 12px 8px 12px;
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #303133;
+            white-space: pre;
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .code-textarea::placeholder {
+            color: #c0c4cc;
+        }
+
+        .code-content {
+            margin: 0;
+            padding: 8px 12px 8px 12px;
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #303133;
+            white-space: pre;
+            flex: 1;
+        }
+
+        .code-content-empty {
+            margin: 0;
+            padding: 8px 12px;
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c0c4cc;
+            white-space: pre;
+        }
+
+        .sql-error {
+            margin-top: 6px;
+        }
+
+        .sql-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #909399;
+        }
+
+        .sql-footer .stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .sql-footer .stats span strong {
+            color: #606266;
+        }
+
+        .sql-footer .stats .label {
+            color: #c0c4cc;
+            margin-right: 2px;
+        }
+
+        .donate-sidebar {
+            width: 100px;
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 8px;
+        }
+
+        .donate-sidebar-text {
+            font-size: 12px;
+            color: #909399;
+            letter-spacing: 2px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .donate-sidebar-qrs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .donate-sidebar-qr {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .donate-sidebar-qr:hover {
+            transform: scale(1.05);
+        }
+
+        .donate-sidebar-qr img {
+            width: 72px;
+            height: 72px;
+            border-radius: 4px;
+            border: 1px solid #e8e8e8;
+            padding: 4px;
+            background: #fff;
+            object-fit: contain;
+        }
+
+        .donate-sidebar-qr span {
+            font-size: 11px;
+            color: #c0c4cc;
+        }
+
+        .el-overlay-dialog {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .el-dialog {
+            margin-top: 0 !important;
+        }
+
+        .donate-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            padding: 16px;
+            height: calc(70vh - 112px);
+            min-height: 588px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .donate-img-col {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .donate-img-col img {
+            max-width: 290px;
+            max-height: calc(100% - 36px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 8px;
+            border: 1px solid #e8e8e8;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .donate-img-col p {
+            font-size: 15px;
+            color: #909399;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="sql-tool">
+            <div class="sql-header">
+                <div class="title-row">
+                    <h3>SQL 工具</h3>
+                    <p>在左侧输入 SQL 代码，结果将显示在右侧</p>
+                </div>
+                <el-button @click="goHome" text
+                    style="padding-left:0"><el-icon><home-filled-icon></home-filled-icon></el-icon>&nbsp;返回首页</el-button>
+            </div>
+
+            <div class="sql-panels">
+                <div class="donate-sidebar">
+                    <span class="donate-sidebar-text">创作不易<br>打赏一二</span>
+                    <div class="donate-sidebar-qrs">
+                        <div class="donate-sidebar-qr" @click="donateVisible = true">
+                            <img src="/assets/images/donate-wechat.png" alt="微信打赏">
+                            <span>微信</span>
+                        </div>
+                        <div class="donate-sidebar-qr" @click="donateVisible = true">
+                            <img src="/assets/images/donate-alipay.png" alt="支付宝打赏">
+                            <span>支付宝</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sql-panel sql-panel-input">
+                    <div class="sql-panel-header">
+                        <span>输入</span>
+                        <div class="sql-panel-actions">
+                            <el-button type="primary" size="small"
+                                @click="formatSql"><el-icon><edit-icon></edit-icon></el-icon>&nbsp;格式化</el-button>
+                            <el-button type="success" size="small"
+                                @click="minifySql"><el-icon><switch-icon></switch-icon></el-icon>&nbsp;压缩</el-button>
+                            <el-button size="small" @click="clearAll" :disabled="!sqlText && !resultText" type="info"
+                                plain><el-icon><delete-icon></delete-icon></el-icon>&nbsp;清空</el-button>
+                        </div>
+                        <div class="sql-panel-options">
+                            <span style="font-size:12px;color:#909399;">方言</span>
+                            <el-select v-model="dialect" size="small" style="width:120px;" @change="onDialectChange">
+                                <el-option v-for="d in dialectOptions" :key="d.value" :label="d.label" :value="d.value"></el-option>
+                            </el-select>
+                            <span style="font-size:12px;color:#909399;">关键字</span>
+                            <el-select v-model="keywordCase" size="small" style="width:80px;" @change="onKeywordCaseChange">
+                                <el-option label="大写" value="upper"></el-option>
+                                <el-option label="小写" value="lower"></el-option>
+                                <el-option label="保留" value="preserve"></el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    <div class="sql-panel-body">
+                        <div class="code-viewer">
+                            <pre class="code-lines" ref="inputLines">{{ inputLineNumbers }}</pre>
+                            <textarea ref="inputArea" v-model="sqlText" class="code-textarea"
+                                placeholder="在此粘贴或输入 SQL 代码..." @keydown="onKeydown"
+                                spellcheck="false"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="sql-panel sql-panel-output">
+                    <div class="sql-panel-header">
+                        <span>结果</span>
+                        <span style="font-weight:400;color:#c0c4cc;font-size:12px;">{{ resultStatus }}</span>
+                        <el-button size="small" @click="copyResult"
+                            :disabled="!resultText"><el-icon><document-copy-icon></document-copy-icon></el-icon>&nbsp;复制结果</el-button>
+                        <span
+                            style="margin-left:auto;font-size:12px;color:#909399;display:flex;align-items:center;gap:4px;">
+                            缩进
+                            <el-input-number v-model="indentSize" :min="1" :max="8" size="small"
+                                style="width:70px;"></el-input-number>
+                        </span>
+                    </div>
+                    <div class="sql-panel-body">
+                        <div class="code-viewer" v-if="resultText">
+                            <pre class="code-lines">{{ resultLineNumbers }}</pre>
+                            <pre class="code-content">{{ resultText }}</pre>
+                        </div>
+                        <div class="code-viewer code-viewer-empty" v-else>
+                            <pre class="code-content-empty">操作结果将显示在这里...</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sql-error" v-if="errorMsg">
+                <el-alert :title="errorMsg" type="error" :closable="true" show-icon @close="errorMsg=''"></el-alert>
+            </div>
+
+            <div class="sql-footer">
+                <div class="stats">
+                    <span><span class="label">输入</span> 字符: <strong>{{ inputCharCount.toLocaleString() }}</strong> | 行:
+                        <strong>{{ inputLineCount }}</strong> | <strong>{{ inputSizeText }}</strong></span>
+                    <span><span class="label">结果</span> 字符: <strong>{{ resultCharCount.toLocaleString() }}</strong> | 行:
+                        <strong>{{ resultLineCount }}</strong> | <strong>{{ resultSizeText }}</strong></span>
+                </div>
+                <span>{{ statusText }}</span>
+            </div>
+        </div>
+
+        <el-dialog v-model="donateVisible" title="创作不易，打赏一二" width="640px" center>
+            <div class="donate-content">
+                <div class="donate-img-col">
+                    <img src="/assets/images/donate-wechat.png" alt="微信打赏">
+                    <p>微信</p>
+                </div>
+                <div class="donate-img-col">
+                    <img src="/assets/images/donate-alipay.png" alt="支付宝打赏">
+                    <p>支付宝</p>
+                </div>
+            </div>
+        </el-dialog>
+
+    </div>
+
+    <script src="/assets/libs/vue/vue.global.prod.js"></script>
+    <script src="/assets/libs/element-plus/element-plus.index.full.min.js"></script>
+    <script src="/assets/libs/element-plus/element-plus.icons.iife.min.js"></script>
+    <script src="/assets/libs/sql-formatter/sql-formatter.min.js"></script>
+
+    <script type="text/javascript">
+        const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
+
+        const app = createApp({
+            setup() {
+                const sqlText = ref('');
+                const resultText = ref('');
+                const errorMsg = ref('');
+                const statusText = ref('');
+                const resultStatus = ref('');
+                const indentSize = ref(2);
+                function loadPref(key, fallback) {
+                    try {
+                        var v = localStorage.getItem('sql-tool-' + key);
+                        return v !== null ? v : fallback;
+                    } catch (e) {
+                        return fallback;
+                    }
+                }
+                function savePref(key, value) {
+                    try { localStorage.setItem('sql-tool-' + key, value); } catch (e) { }
+                }
+
+                function onDialectChange(v) {
+                    savePref('dialect', v);
+                }
+                function onKeywordCaseChange(v) {
+                    savePref('keywordCase', v);
+                }
+
+                const dialect = ref(loadPref('dialect', 'transactsql'));
+                const keywordCase = ref(loadPref('keywordCase', 'lower'));
+                const donateVisible = ref(false);
+                const inputArea = ref(null);
+                const inputLines = ref(null);
+
+                const dialectOptions = [
+                    { label: 'Transact-SQL', value: 'transactsql' },
+                    { label: 'Standard SQL', value: 'sql' },
+                    { label: 'MySQL', value: 'mysql' },
+                    { label: 'MariaDB', value: 'mariadb' },
+                    { label: 'PostgreSQL', value: 'postgresql' },
+                    { label: 'SQLite', value: 'sqlite' },
+                    { label: 'BigQuery', value: 'bigquery' },
+                    { label: 'ClickHouse', value: 'clickhouse' },
+                    { label: 'DB2', value: 'db2' },
+                    { label: 'DB2i', value: 'db2i' },
+                    { label: 'DuckDB', value: 'duckdb' },
+                    { label: 'Hive', value: 'hive' },
+                    { label: 'N1QL', value: 'n1ql' },
+                    { label: 'PL/SQL', value: 'plsql' },
+                    { label: 'Redshift', value: 'redshift' },
+                    { label: 'SingleStoreDB', value: 'singlestoredb' },
+                    { label: 'Snowflake', value: 'snowflake' },
+                    { label: 'Spark SQL', value: 'spark' },
+                    { label: 'Trino', value: 'trino' },
+                ];
+
+                const inputCharCount = computed(function () { return sqlText.value.length; });
+                const inputLineCount = computed(function () {
+                    if (!sqlText.value) return 0;
+                    return sqlText.value.split(/\r?\n/).length;
+                });
+                const inputSizeText = computed(function () {
+                    return formatSize(sqlText.value);
+                });
+
+                const inputLineNumbers = computed(function () {
+                    if (!sqlText.value) return '1';
+                    const lines = sqlText.value.split(/\r?\n/);
+                    const nums = [];
+                    for (let i = 0; i < lines.length; i++) {
+                        nums.push(i + 1);
+                    }
+                    return nums.join('\n');
+                });
+
+                const resultCharCount = computed(function () { return resultText.value.length; });
+                const resultLineCount = computed(function () {
+                    if (!resultText.value) return 0;
+                    return resultText.value.split(/\r?\n/).length;
+                });
+                const resultSizeText = computed(function () {
+                    return formatSize(resultText.value);
+                });
+
+                const resultLineNumbers = computed(function () {
+                    if (!resultText.value) return '';
+                    const lines = resultText.value.split(/\r?\n/);
+                    const nums = [];
+                    for (let i = 0; i < lines.length; i++) {
+                        nums.push(i + 1);
+                    }
+                    return nums.join('\n');
+                });
+
+                function formatSize(str) {
+                    if (!str) return '0 B';
+                    const bytes = new Blob([str]).size;
+                    if (bytes < 1024) return bytes + ' B';
+                    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+                }
+
+                function setStatus(msg) {
+                    statusText.value = msg;
+                    setTimeout(function () { if (statusText.value === msg) statusText.value = ''; }, 2000);
+                }
+
+                function setResult(msg, statusLabel) {
+                    resultText.value = msg;
+                    resultStatus.value = statusLabel || '';
+                    errorMsg.value = '';
+                }
+
+                function showError(msg) {
+                    errorMsg.value = msg;
+                    resultStatus.value = '操作失败';
+                }
+
+                function buildFormatOptions() {
+                    return {
+                        language: dialect.value,
+                        tabWidth: indentSize.value,
+                        keywordCase: keywordCase.value,
+                        dataTypeCase: keywordCase.value,
+                        functionCase: keywordCase.value,
+                        identifierCase: keywordCase.value,
+                        logicalOperatorNewline: 'before',
+                        linesBetweenQueries: 1,
+                        denseOperators: false,
+                        newlineBeforeSemicolon: false,
+                    };
+                }
+
+                function formatSql() {
+                    if (!sqlText.value) return;
+                    try {
+                        const opts = buildFormatOptions();
+                        const formatted = sqlFormatter.format(sqlText.value, opts);
+                        setResult(formatted, '格式化完成');
+                        setStatus('格式化完成');
+                    } catch (e) {
+                        showError('SQL 格式化失败: ' + e.message);
+                    }
+                }
+
+                function minifySql() {
+                    if (!sqlText.value) return;
+                    try {
+                        // First format to normalize, then compress
+                        const opts = buildFormatOptions();
+                        opts.tabWidth = 0;
+                        opts.linesBetweenQueries = 0;
+                        opts.newlineBeforeSemicolon = false;
+                        const formatted = sqlFormatter.format(sqlText.value, opts);
+                        // Remove newlines and collapse spaces
+                        const compressed = formatted
+                            .replace(/\r?\n/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                        setResult(compressed, '压缩完成');
+                        setStatus('压缩完成');
+                    } catch (e) {
+                        showError('SQL 压缩失败: ' + e.message);
+                    }
+                }
+
+                function copyResult() {
+                    if (!resultText.value) return;
+                    navigator.clipboard.writeText(resultText.value).then(function () {
+                        setStatus('结果已复制到剪贴板');
+                        ElementPlus.ElMessage.success('结果已复制到剪贴板');
+                    }).catch(function (e) {
+                        showError('复制失败，请手动选择复制');
+                    });
+                }
+
+                function clearAll() {
+                    sqlText.value = '';
+                    resultText.value = '';
+                    errorMsg.value = '';
+                    resultStatus.value = '';
+                    setStatus('已清空');
+                }
+
+                function onKeydown(e) {
+                    if ((e.ctrlKey && e.shiftKey && e.key === 'F') || (e.ctrlKey && e.altKey && e.key === 'l')) {
+                        e.preventDefault();
+                        formatSql();
+                    }
+                    if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+                        e.preventDefault();
+                        minifySql();
+                    }
+                }
+
+                function goHome() {
+                    window.location.href = '/';
+                }
+
+                function adjustSize() {
+                    nextTick(function () {
+                        var ta = inputArea.value;
+                        var lines = inputLines.value;
+                        if (!ta) return;
+                        ta.style.minHeight = '';
+                        ta.style.minWidth = '';
+                        if (lines) lines.style.minHeight = '';
+
+                        var parent = ta.parentElement;
+                        var sty = getComputedStyle(ta);
+                        var padV = parseFloat(sty.paddingTop) + parseFloat(sty.paddingBottom);
+                        var padH = parseFloat(sty.paddingLeft) + parseFloat(sty.paddingRight);
+
+                        var contentH = ta.scrollHeight - padV;
+                        var contentW = ta.scrollWidth - padH;
+
+                        var availH = parent.clientHeight - padV;
+                        var availW = parent.clientWidth - padH;
+
+                        if (contentH > availH) {
+                            ta.style.minHeight = contentH + 'px';
+                            if (lines) lines.style.minHeight = contentH + 'px';
+                        }
+                        if (contentW > availW) {
+                            ta.style.minWidth = contentW + 'px';
+                        }
+                    });
+                }
+
+                watch(sqlText, adjustSize);
+
+                watch(dialect, function (v) { savePref('dialect', v); });
+                watch(keywordCase, function (v) { savePref('keywordCase', v); });
+
+                onMounted(function () {
+                    adjustSize();
+                });
+
+                return {
+                    sqlText,
+                    resultText,
+                    errorMsg,
+                    statusText,
+                    resultStatus,
+                    indentSize,
+                    dialect,
+                    keywordCase,
+                    dialectOptions,
+                    donateVisible,
+                    inputArea,
+                    inputLines,
+                    inputCharCount,
+                    inputLineCount,
+                    inputSizeText,
+                    inputLineNumbers,
+                    resultCharCount,
+                    resultLineCount,
+                    resultSizeText,
+                    resultLineNumbers,
+                    formatSql,
+                    minifySql,
+                    copyResult,
+                    clearAll,
+                    goHome,
+                    onDialectChange,
+                    onKeywordCaseChange,
+                    onKeydown
+                };
+            }
+        });
+
+        // Register Element Plus icons
+        app.component('edit-icon', ElementPlusIconsVue.Edit);
+        app.component('switch-icon', ElementPlusIconsVue.Switch);
+        app.component('document-copy-icon', ElementPlusIconsVue.DocumentCopy);
+        app.component('delete-icon', ElementPlusIconsVue.Delete);
+        app.component('home-filled-icon', ElementPlusIconsVue.HomeFilled);
+
+        app.use(ElementPlus);
+        app.mount('#app');
+    </script>
+</body>
+
+</html>
