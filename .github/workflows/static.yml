@@ -84,7 +84,7 @@ jobs: # 定义工作流中的作业列表
               lines.append("  <url>")
               lines.append(f"    <loc>{loc}</loc>")
               lines.append(f"    <lastmod>{now}</lastmod>")
-              lines.append("    <changefreq>monthly</changefreq>")
+              lines.append("    <changefreq>daily</changefreq>")
               lines.append(f"    <priority>{priority}</priority>")
               lines.append(f"    <page:name>{xml_escape(title)}</page:name>")
               lines.append(f"    <page:description>{xml_escape(description)}</page:description>")
