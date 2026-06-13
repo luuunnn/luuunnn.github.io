@@ -456,6 +456,14 @@
     <script src="/assets/libs/sql-formatter/sql-formatter.min.js"></script>
     <script src="/assets/libs/prism/prism.min.js"></script>
     <script src="/assets/libs/prism/prism-sql.min.js"></script>
+    <script>
+        // 补充 Prism SQL 缺失的 T-SQL 数据类型关键词
+        (function () {
+            var kw = Prism.languages.sql.keyword;
+            var missing = 'NVARCHAR|NTEXT|MONEY|SMALLMONEY|SMALLDATETIME|DATETIME2|DATETIMEOFFSET|IMAGE|SQL_VARIANT|UNIQUEIDENTIFIER|XML|HIERARCHYID|ROWVERSION';
+            Prism.languages.sql.keyword = new RegExp(kw.source.replace(/\)\\b$/, '|' + missing + ')\\b'), kw.flags);
+        })();
+    </script>
 
     <script type="text/javascript">
         const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
@@ -583,8 +591,8 @@
                         tabWidth: indentSize.value,
                         keywordCase: keywordCase.value,
                         dataTypeCase: keywordCase.value,
-                        functionCase: keywordCase.value,
-                        identifierCase: keywordCase.value,
+                        functionCase: 'preserve',
+                        identifierCase: 'preserve',
                         logicalOperatorNewline: 'before',
                         linesBetweenQueries: 1,
                         denseOperators: false,
@@ -592,11 +600,34 @@
                     };
                 }
 
+                // 补充 sql-formatter 库各方言中遗漏的数据类型关键词的大小写转换
+                function applyMissingDataTypeCase(sql, targetCase) {
+                    if (targetCase === 'preserve') return sql;
+                    // 按长度降序排列，避免短词先匹配导致长词被部分替换
+                    var missingTypes = [
+                        'UNIQUEIDENTIFIER', 'SMALLDATETIME', 'DATETIMEOFFSET', 'SQL_VARIANT',
+                        'SMALLMONEY', 'HIERARCHYID', 'ROWVERSION',
+                        'TINYINT', 'SMALLINT', 'BIGINT', 'MONEY', 'NTEXT', 'IMAGE', 'TEXT'
+                    ];
+                    var result = sql;
+                    for (var i = 0; i < missingTypes.length; i++) {
+                        var dt = missingTypes[i];
+                        var regex = new RegExp('\\b' + dt + '\\b', 'gi');
+                        if (targetCase === 'upper') {
+                            result = result.replace(regex, dt.toUpperCase());
+                        } else {
+                            result = result.replace(regex, dt.toLowerCase());
+                        }
+                    }
+                    return result;
+                }
+
                 function formatSql() {
                     if (!sqlText.value) return;
                     try {
                         const opts = buildFormatOptions();
-                        const formatted = sqlFormatter.format(sqlText.value, opts);
+                        var formatted = sqlFormatter.format(sqlText.value, opts);
+                        formatted = applyMissingDataTypeCase(formatted, keywordCase.value);
                         setResult(formatted, '格式化完成');
                         setStatus('格式化完成');
                     } catch (e) {
@@ -612,7 +643,8 @@
                         opts.tabWidth = 0;
                         opts.linesBetweenQueries = 0;
                         opts.newlineBeforeSemicolon = false;
-                        const formatted = sqlFormatter.format(sqlText.value, opts);
+                        var formatted = sqlFormatter.format(sqlText.value, opts);
+                        formatted = applyMissingDataTypeCase(formatted, keywordCase.value);
                         // Remove newlines and collapse spaces
                         const compressed = formatted
                             .replace(/\r?\n/g, ' ')
